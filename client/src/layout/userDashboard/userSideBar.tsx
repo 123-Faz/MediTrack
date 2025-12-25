@@ -15,6 +15,7 @@ import {
   Shield,
   LogOut,
   User,
+  Stethoscope
 } from "lucide-react";
 import UserSidebarNav from "./userSidebarNav";
 import profileImage from "@/assets/pirate.jpg";
@@ -49,12 +50,23 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ logoutHandle }) => {
           <SidebarMenuItem>
             <Link
               to="/"
-              className="flex items-center space-x-1 sm:space-x-2 flex-1 md:flex-none justify-center md:justify-start min-w-0 h-16"
+              className="flex items-center space-x-2 flex-1 lg:flex-none justify-center lg:justify-start min-w-0 px-2 h-16"
             >
-              <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-              <span className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-blue-600 to-yellow-500 bg-clip-text text-transparent truncate">
-                ComplainDesk
-              </span>
+              {/* Icon */}
+              <div className="relative flex-shrink-0">
+                <Stethoscope className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border border-white dark:border-gray-900"></div>
+              </div>
+
+              {/* Text - Single line with truncate */}
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate">
+                  MediTrack
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  Healthcare
+                </span>
+              </div>
             </Link>
           </SidebarMenuItem>
         </SidebarMenu>

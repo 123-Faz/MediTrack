@@ -9,8 +9,13 @@ import {
   Filter,
   UserCheck,
   Stethoscope,
-  MapPin
+  MapPin,
+  Award,
+  TrendingUp,
+  AlertCircle
 } from 'lucide-react';
+import type{userLayoutContextType} from "@/layout/adminDashboard/types"
+import { useOutletContext } from 'react-router-dom';
 
 interface Doctor {
   _id: string;
@@ -41,6 +46,11 @@ const AdminDashboard: React.FC = () => {
   const [scheduleLoading, setScheduleLoading] = useState(false);
   const [scheduleSuccess, setScheduleSuccess] = useState(false);
 
+  const {setBreadcrumb} = useOutletContext<userLayoutContextType>();
+
+  useEffect(() => {
+    setBreadcrumb(['Dashboard', 'All Doctors'])
+  }, [setBreadcrumb])
   const [scheduleForm, setScheduleForm] = useState<ScheduleFormData>({
     doctorId: '',
     startDate: '',
@@ -62,7 +72,7 @@ const AdminDashboard: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const token = getCookie('admin_token'); // Assuming admin token in cookies
+      const token = getCookie('admin_token');
       if (!token) {
         setError('Authentication required');
         return;
@@ -210,17 +220,17 @@ const AdminDashboard: React.FC = () => {
   };
 
   const getExperienceColor = (experience: number) => {
-    if (experience >= 10) return 'bg-purple-100 text-purple-800';
-    if (experience >= 5) return 'bg-blue-100 text-blue-800';
-    return 'bg-green-100 text-green-800';
+    if (experience >= 10) return 'bg-ppl1 text-ppl6';
+    if (experience >= 5) return 'bg-bl1 text-bl6';
+    return '';
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-bg2 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading doctors...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-bl6 mx-auto mb-4"></div>
+          <p className="text-fg1-4 text-lg font-semibold">Loading doctors...</p>
         </div>
       </div>
     );
@@ -228,16 +238,16 @@ const AdminDashboard: React.FC = () => {
 
   if (error && !showScheduleModal) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-bg2 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="w-8 h-8 text-red-600" />
+          <div className="w-16 h-16 bg-rd1 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-rd6" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Load Doctors</h3>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <h3 className="text-lg font-semibold text-fg0 mb-2">Unable to Load Doctors</h3>
+          <p className="text-fg1-4 mb-4">{error}</p>
           <button
             onClick={fetchDoctors}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-bl6 text-white rounded-lg hover:bg-bl7 transition-colors"
           >
             Try Again
           </button>
@@ -247,82 +257,127 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-bg2 themeShift p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto">
         
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Doctor Management</h1>
-          <p className="text-xl text-gray-600">Manage doctors and assign schedules</p>
+        <div className="mb-8">
+          <h1 className="text-3xl lg:text-4xl font-bold text-bl5 text-center mb-2">
+            Doctor Management 👨‍⚕️
+          </h1>
+          <p className="text-bg6 text-lg text-center">
+            Manage doctors and assign schedules
+          </p>
         </div>
 
-        {/* Stats Card */}
-        <div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-6 mb-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{doctors.length}</div>
-              <div className="text-sm text-gray-600">Total Doctors</div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total Doctors */}
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-bl1 rounded-xl">
+                <Users className="w-6 h-6 text-bl5" />
+              </div>
+              <TrendingUp className="w-5 h-5 text-gr6" />
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+            <h3 className="text-2xl font-bold text-fg0 mb-2">{doctors.length}</h3>
+            <p className="text-fg1-4 font-medium">Total Doctors</p>
+            <div className="mt-3 pt-3 border-t border-bg3">
+              <span className="text-bl6 font-medium text-sm">
+                {getSpecializations().length} specializations
+              </span>
+            </div>
+          </div>
+
+          {/* Specializations */}
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-gr1 rounded-xl">
+                <Stethoscope className="w-6 h-6 text-gr6" />
+              </div>
+              <span className="text-gr6 bg-gr1 px-2 py-1 rounded-lg text-sm font-bold">
                 {getSpecializations().length}
-              </div>
-              <div className="text-sm text-gray-600">Specializations</div>
+              </span>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">
+            <h3 className="text-2xl font-bold text-fg0 mb-2">{getSpecializations().length}</h3>
+            <p className="text-fg1-4 font-medium">Specializations</p>
+          </div>
+
+          {/* Experienced Doctors */}
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-yl1 rounded-xl">
+                <Award className="w-6 h-6 text-yl6" />
+              </div>
+              <span className="text-bl5 bg-bl7 px-2 py-1 rounded-lg text-sm font-bold">
                 {doctors.filter(d => d.experience >= 5).length}
-              </div>
-              <div className="text-sm text-gray-600">Experienced (5+ yrs)</div>
+              </span>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
+            <h3 className="text-2xl font-bold text-fg0 mb-2">
+              {doctors.filter(d => d.experience >= 5).length}
+            </h3>
+            <p className="text-fg1-4 font-medium">Experienced (5+ yrs)</p>
+          </div>
+
+          {/* Senior Doctors */}
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-ppl1 rounded-xl">
+                <Award className="w-6 h-6 text-ppl5" />
+              </div>
+              <span className="text-ppl5 bg-ppl1 px-2 py-1 rounded-lg text-sm font-bold">
                 {doctors.filter(d => d.experience >= 10).length}
-              </div>
-              <div className="text-sm text-gray-600">Senior (10+ yrs)</div>
+              </span>
             </div>
+            <h3 className="text-2xl font-bold text-fg0 mb-2">
+              {doctors.filter(d => d.experience >= 10).length}
+            </h3>
+            <p className="text-fg1-4 font-medium">Senior (10+ yrs)</p>
           </div>
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
+        <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-fg1-4 w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Search doctors by name or specialization..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-3 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift"
                 />
               </div>
             </div>
 
             {/* Specialization Filter */}
             <div className="flex gap-2">
-              <select
-                value={specializationFilter}
-                onChange={(e) => setSpecializationFilter(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">All Specializations</option>
-                {getSpecializations().map(spec => (
-                  <option key={spec} value={spec}>{spec}</option>
-                ))}
-              </select>
+              <div className="relative flex-1">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-fg1-4 w-5 h-5" />
+                <select
+                  value={specializationFilter}
+                  onChange={(e) => setSpecializationFilter(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 appearance-none cursor-pointer themeShift"
+                >
+                  <option value="all">All Specializations</option>
+                  {getSpecializations().map(spec => (
+                    <option key={spec} value={spec}>{spec}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Doctors Grid */}
         {filteredDoctors.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-12 text-center">
-            <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No doctors found</h3>
-            <p className="text-gray-500">
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-12 text-center">
+            <Users className="w-16 h-16 text-bg4 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-fg0 mb-2">No doctors found</h3>
+            <p className="text-fg1-4">
               {doctors.length === 0 
                 ? "No doctors are registered in the system." 
                 : "No doctors match your current filters."}
@@ -333,17 +388,17 @@ const AdminDashboard: React.FC = () => {
             {filteredDoctors.map((doctor) => (
               <div
                 key={doctor._id}
-                className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-200"
+                className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 hover:shadow-xl transition-all duration-200 hover:-translate-y-1 group"
               >
                 {/* Doctor Header */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                      <UserCheck className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 bg-bl6 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <UserCheck className="w-6 h-6 text-bl4" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 text-lg">{doctor.username}</h3>
-                      <p className="text-sm text-gray-600">Medical Professional</p>
+                      <h3 className="font-bold text-fg0 text-lg">Dr. {doctor.username}</h3>
+                      <p className="text-sm text-fg1-5">Medical Professional</p>
                     </div>
                   </div>
                 </div>
@@ -351,8 +406,8 @@ const AdminDashboard: React.FC = () => {
                 {/* Specialization and Experience */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
-                    <Stethoscope className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-medium text-gray-900 capitalize">
+                    <Stethoscope className="w-4 h-4 text-bl4" />
+                    <span className="text-sm font-semibold text-fg0 capitalize">
                       {doctor.specialization}
                     </span>
                   </div>
@@ -363,12 +418,12 @@ const AdminDashboard: React.FC = () => {
 
                 {/* Additional Info */}
                 <div className="space-y-2 mb-6">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <div className="flex items-center space-x-2 text-sm text-fg1-4">
                     <MapPin className="w-4 h-4" />
                     <span>Available for scheduling</span>
                   </div>
                   {doctor.email && (
-                    <div className="text-sm text-gray-600 truncate">
+                    <div className="text-sm text-fg1-5 truncate">
                       📧 {doctor.email}
                     </div>
                   )}
@@ -377,7 +432,7 @@ const AdminDashboard: React.FC = () => {
                 {/* Action Button */}
                 <button
                   onClick={() => openScheduleModal(doctor)}
-                  className="w-full bg-green-600 text-white py-3 px-4 rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="w-full bg-gr5 text-white py-3 px-4 rounded-xl hover:bg-gr4 transition-colors flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl"
                 >
                   <Calendar className="w-4 h-4" />
                   Assign Schedule
@@ -390,26 +445,26 @@ const AdminDashboard: React.FC = () => {
         {/* Schedule Assignment Modal */}
         {showScheduleModal && selectedDoctor && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-2xl font-bold text-gray-900">
+            <div className="bg-bg1 rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-bg3">
+              <div className="p-6 border-b border-bg3">
+                <h3 className="text-2xl font-bold text-fg0">
                   Assign Schedule
                 </h3>
-                <p className="text-gray-600 mt-2">
-                  For Dr. {selectedDoctor.username} - {selectedDoctor.specialization}
+                <p className="text-fg1-4 mt-2">
+                  For Dr. <span className="font-semibold text-bl6">{selectedDoctor.username}</span> - {selectedDoctor.specialization}
                 </p>
               </div>
 
               <form onSubmit={assignSchedule} className="p-6">
                 {error && (
-                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-                    <p className="text-red-800">{error}</p>
+                  <div className="mb-6 p-4 bg-rd1 border border-rd2 rounded-xl">
+                    <p className="text-rd8">{error}</p>
                   </div>
                 )}
 
                 {scheduleSuccess && (
-                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
-                    <p className="text-green-800 font-semibold">
+                  <div className="mb-6 p-4 bg-gr1 border border-gr2 rounded-xl">
+                    <p className="text-gr8 font-semibold">
                       ✅ Schedule assigned successfully! Redirecting...
                     </p>
                   </div>
@@ -418,7 +473,7 @@ const AdminDashboard: React.FC = () => {
                 {/* Date Range */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-fg0 mb-2">
                       Start Date *
                     </label>
                     <input
@@ -430,12 +485,12 @@ const AdminDashboard: React.FC = () => {
                         startDate: e.target.value 
                       }))}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-3 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-fg0 mb-2">
                       End Date *
                     </label>
                     <input
@@ -447,7 +502,7 @@ const AdminDashboard: React.FC = () => {
                         endDate: e.target.value 
                       }))}
                       min={scheduleForm.startDate || new Date().toISOString().split('T')[0]}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-3 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift"
                     />
                   </div>
                 </div>
@@ -455,7 +510,7 @@ const AdminDashboard: React.FC = () => {
                 {/* Time Range */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-fg0 mb-2">
                       Start Time *
                     </label>
                     <input
@@ -466,12 +521,12 @@ const AdminDashboard: React.FC = () => {
                         ...prev, 
                         startTime: e.target.value 
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-3 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-fg0 mb-2">
                       End Time *
                     </label>
                     <input
@@ -482,25 +537,25 @@ const AdminDashboard: React.FC = () => {
                         ...prev, 
                         endTime: e.target.value 
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-3 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift"
                     />
                   </div>
                 </div>
 
                 {/* Schedule Preview */}
                 {(scheduleForm.startDate || scheduleForm.endDate) && (
-                  <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                    <h4 className="font-semibold text-blue-900 mb-2">Schedule Preview</h4>
-                    <div className="text-sm text-blue-800 space-y-1">
+                  <div className="mb-6 p-4 bg-bl1 rounded-xl border border-bl2">
+                    <h4 className="font-semibold text-bl6 mb-2">Schedule Preview</h4>
+                    <div className="text-sm text-bl6 space-y-1">
                       <div className="flex justify-between">
                         <span>Duration:</span>
-                        <span>
+                        <span className="font-medium">
                           {scheduleForm.startDate} to {scheduleForm.endDate}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Timing:</span>
-                        <span>
+                        <span className="font-medium">
                           {scheduleForm.startTime} - {scheduleForm.endTime}
                         </span>
                       </div>
@@ -509,18 +564,18 @@ const AdminDashboard: React.FC = () => {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 pt-4 border-t border-gray-200">
+                <div className="flex gap-3 pt-4 border-t border-bg3">
                   <button
                     type="button"
                     onClick={closeScheduleModal}
-                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-4 py-3 border border-bg3 text-fg1-4 rounded-xl hover:bg-bg2 transition-colors hover:border-fg1-5"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={scheduleLoading || scheduleSuccess}
-                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                    className="flex-1 px-4 py-3 bg-gr6 text-white rounded-xl hover:bg-gr7 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                   >
                     {scheduleLoading ? (
                       <>

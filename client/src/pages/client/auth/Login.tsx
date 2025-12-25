@@ -37,7 +37,7 @@ export const PatientLogin: React.FC<PatientLoginProps> = ({
       dispatch(setCredentials(data));
       toast.success("Welcome back! Login Successful!");
       reset();
-      navigate("/patient-dashboard");
+      navigate("/dashboard");
       onClose();
     },
     onError: (error: any) => {

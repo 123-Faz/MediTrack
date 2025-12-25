@@ -70,7 +70,19 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
-		/* === BLUE === */
+
+	--color-ppl1: var(--clr2-1);
+	--color-ppl2: var(--clr2-2);
+	--color-ppl3: var(--clr2-3);
+	--color-ppl4: var(--clr2-4);
+	--color-ppl5: var(--clr2-5);
+	--color-ppl6: var(--clr2-6);
+	--color-ppl7: var(--clr2-7);
+	--color-ppl8: var(--clr2-8);
+	--color-ppl9: var(--clr2-9);
+	--color-ppl10: var(--clr2-9);
+
+	/* === BLUE === */
 	--color-bl1: var(--clr3-1);
 	--color-bl2: var(--clr3-2);
 	--color-bl3: var(--clr3-3);
@@ -295,7 +307,7 @@
 	--clr3-3: #2563eb; /* blue-700 */
 	--clr3-4: #3b82f6; /* blue-600 */
 	--clr3-5: #60a5fa; /* blue-500 */
-	--clr3-6: #93c5fd; /* blue-400 */
+	--clr3-6: #1e3a8a; /* blue-400 */
 	--clr3-7: #bfdbfe; /* blue-300 */
 	--clr3-8: #dbeafe; /* blue-200 */
 	--clr3-9: #eff6ff; /* blue-100 */

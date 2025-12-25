@@ -319,15 +319,18 @@ export const createPrescription = async (
     const appointmentObjectId = new Types.ObjectId(appointment_id);
     const doctorObjectId = new Types.ObjectId(doctor_id);
 
-    // Find appointment using ObjectId
+    // Find appointment using ObjectId and populate patient details
     const appointment = await Appointment.findOne({
       _id: appointmentObjectId,
       doctor: doctorObjectId,
-    });
+    }).populate('user', 'name email'); // Populate patient details
 
     if (!appointment) {
       throw new ApiError("Appointment not found", StatusCodes.NOT_FOUND);
     }
+
+    // Get patient_id from appointment
+    const patient_id = (appointment as any).user;
 
     // Parse medications
     let medicationsArray: IMedication[] = [];
@@ -372,10 +375,11 @@ export const createPrescription = async (
       }
     }
 
-    // Create prescription with ObjectIds
+    // Create prescription with proper references
     const prescriptionData = {
-      patient_id: appointmentObjectId, // Pass as ObjectId
-      doctor_id: doctorObjectId, // Pass as ObjectId
+      appointment_id: appointmentObjectId,
+      patient_id: patient_id, // Actual patient reference
+      doctor_id: doctorObjectId,
       medications: medicationsArray.map((med) => ({
         name: med.name,
         dosage: med.dosage,
@@ -390,6 +394,11 @@ export const createPrescription = async (
     };
 
     const prescription = await Prescription.create(prescriptionData);
+
+    // Populate the response with appointment and doctor details
+    await prescription.populate('appointment_id', 'patientName appointmentType createdAt');
+    await prescription.populate('doctor_id', 'username specialization');
+    await prescription.populate('patient_id', 'name email');
 
     return res.status(StatusCodes.CREATED).json({
       message: "Prescription created successfully",

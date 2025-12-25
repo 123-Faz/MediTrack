@@ -280,21 +280,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="px-6 py-12 md:px-12 lg:px-24 bg-gray-900 text-gray-400">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-3 mb-4 md:mb-0">
-              <Stethoscope className="w-8 h-8 text-blue-400" />
-              <span className="text-xl font-bold text-white">MediTrack</span>
-            </div>
-            <div className="text-sm">
-              © 2024 MediTrack. All rights reserved. Built for modern healthcare.
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

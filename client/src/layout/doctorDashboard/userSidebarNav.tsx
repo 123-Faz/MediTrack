@@ -45,16 +45,16 @@ const items = [
     url: "/drDashboard/treatment",
     icon: Stethoscope,
   },
-  {
-    title: "Notifications",
-    url: "/drdashboard/notifications",
-    icon: AlertCircle,
-  },
-  {
-    title: "Settings",
-    url: "/dashboard/settings",
-    icon: Settings,
-  },
+  // {
+  //   title: "Notifications",
+  //   url: "/drdashboard/notifications",
+  //   icon: AlertCircle,
+  // },
+  // {
+  //   title: "Settings",
+  //   url: "/dashboard/settings",
+  //   icon: Settings,
+  // },
 ];
 
 const UserSidebarNav = () => {
@@ -62,7 +62,7 @@ const UserSidebarNav = () => {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-2xl font-bold">User Dashboard</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-2xl font-bold">Doctor Dashboard</SidebarGroupLabel>
       <SidebarGroupContent >
         <SidebarMenu>
   {items.map((item) => {

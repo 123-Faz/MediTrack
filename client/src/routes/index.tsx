@@ -135,7 +135,7 @@ const Doctors = lazy(() => import("@/pages/doctors"));
 const Appointments = lazy(() => import("@/pages/apointments"));
 
 const MyPrescription = lazy(() => import("@/pages/client/MyPrescriptions"));
-const Doctor = lazy(() => import("@/pages/client/Doctors/DoctorList"));
+const Doctor = lazy(() => import("@/pages/client/DoctorList"));
 const MyAppintments = lazy(() => import("@/pages/client/MyAppointments"));
 const NewAppointments = lazy(() => import("@/pages/client/NewAppointment"));
 const Report = lazy(() => import("@/pages/client/ReportFiles"));

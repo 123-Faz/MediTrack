@@ -1,6 +1,6 @@
 // pages/doctors.tsx
 import React from 'react';
-import DoctorList from './DoctorList';
+import DoctorList from '../DoctorList';
 
 const DoctorsPage: React.FC = () => {
   return (

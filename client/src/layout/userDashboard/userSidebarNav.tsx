@@ -3,9 +3,11 @@ import {
   Home,
   Inbox,
   Search,
-  Settings,
+  ClipboardList,
   AlertCircle,
   User,
+  Clock,
+  Stethoscope
 } from "lucide-react";
 
 // Import sidebar components individually
@@ -38,23 +40,23 @@ const items = [
   {
     title: "My Appointments", // Fixed from "My Complains"
     url: "/dashboard/myappointments",
-    icon: Search,
+    icon: Clock,
   },
   {
     title: "My Prescriptions",
     url: "/dashboard/myprescriptions",
-    icon: Settings,
+    icon: ClipboardList,
   },
   {
-    title: "Profile",
+    title: "Doctors",
     url: "/dashboard/doctors",
-    icon: User,
+    icon: Stethoscope,
   },
-  {
-    title: "Report",
-    url: "/dashboard/report",
-    icon: AlertCircle,
-  },
+  // {
+  //   title: "Report",
+  //   url: "/dashboard/report",
+  //   icon: AlertCircle,
+  // },
 ];
 
 const UserSidebarNav = () => {
@@ -73,7 +75,7 @@ const UserSidebarNav = () => {
                   <Link
                     to={item.url}
                     className={cn(
-                      "flex items-center gap-4 px-4 py-3 my-2 rounded-xl text-lg font-medium transition-all duration-300",
+                      "flex items-center gap-4 px-4 py-3 my-4 rounded-xl text-lg font-medium transition-all duration-300",
                       "hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900 dark:hover:text-blue-300",
                       isActive
                         ? "bg-blue-600 text-white shadow-md"

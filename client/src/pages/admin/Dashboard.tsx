@@ -1,5 +1,7 @@
 // components/AdminDashboard.tsx
 import React, { useState, useEffect } from 'react';
+import type { userLayoutContextType } from '@/layout/adminDashboard/types';
+import { useOutletContext } from 'react-router-dom';
 import { 
   Users, 
   UserCheck, 
@@ -9,8 +11,12 @@ import {
   Clock,
   Stethoscope,
   Activity,
-  Shield
+  Shield,
+  Search,
+  ArrowUpRight,
+  Bell
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface DashboardStats {
   totalUsers: number;
@@ -28,6 +34,13 @@ const AdminDashboard: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const {setBreadcrumb} = useOutletContext<userLayoutContextType>();
+
+  useEffect(() => {
+    setBreadcrumb(['Dashboard', 'Admin Dashboard'])
+  }, [setBreadcrumb])
 
   useEffect(() => {
     fetchDashboardData();
@@ -98,10 +111,10 @@ const AdminDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-bg1 to-bg2 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-bl6 mx-auto mb-4"></div>
+          <p className="text-fg1-4 text-lg font-semibold">Loading admin dashboard...</p>
         </div>
       </div>
     );
@@ -109,16 +122,16 @@ const AdminDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-bg1 to-bg2 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Activity className="w-8 h-8 text-red-600" />
+          <div className="w-16 h-16 bg-rd1 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Activity className="w-8 h-8 text-rd6" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Load Dashboard</h3>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <h3 className="text-lg font-semibold text-fg0 mb-2">Unable to Load Dashboard</h3>
+          <p className="text-fg1-4 mb-4">{error}</p>
           <button
             onClick={fetchDashboardData}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-bl6 text-white rounded-lg hover:bg-bl7 transition-colors"
           >
             Try Again
           </button>
@@ -128,226 +141,293 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+    <div className="min-h-screen bg-bg2 themeShift p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <p className="text-xl text-gray-600">Welcome back! Here's your system overview</p>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl lg:text-3xl font-bold text-bl5 text-center b-2">
+                System overview and management
+              </h1>
+            </div>
+            
+            {/* Search Bar */}
+            <div className="relative lg:w-80">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-fg1-4 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search users, doctors..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-bg1 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Users */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalUsers}</p>
-                <div className="flex items-center mt-1">
-                  <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                  <span className="text-sm text-green-600">
-                    +{getGrowthPercentage(stats.totalUsers, Math.max(0, stats.totalUsers - 5))}%
-                  </span>
-                </div>
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-bl1 rounded-xl">
+                <Users className="w-6 h-6 text-bl5" />
               </div>
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
+              <TrendingUp className="w-5 h-5 text-gr6" />
+            </div>
+            <h3 className="text-2xl font-bold text-fg0 mb-2">{stats.totalUsers}</h3>
+            <p className="text-fg1-4 font-medium">Total Users</p>
+            <div className="mt-3 pt-3 border-t border-bg3">
+              <Link 
+                to="/admin/users" 
+                className="text-bl6 hover:text-bl7 font-medium text-sm flex items-center group"
+              >
+                Manage
+                <ArrowUpRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </Link>
             </div>
           </div>
 
           {/* Total Doctors */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Doctors</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalDoctors}</p>
-                <div className="flex items-center mt-1">
-                  <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                  <span className="text-sm text-green-600">
-                    +{getGrowthPercentage(stats.totalDoctors, Math.max(0, stats.totalDoctors - 2))}%
-                  </span>
-                </div>
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-gr1 rounded-xl">
+                <UserCheck className="w-6 h-6 text-gr6" />
               </div>
-              <div className="p-3 bg-green-100 rounded-xl">
-                <UserCheck className="w-6 h-6 text-green-600" />
-              </div>
+              <TrendingUp className="w-5 h-5 text-gr6" />
+            </div>
+            <h3 className="text-2xl font-bold text-fg0 mb-2">{stats.totalDoctors}</h3>
+            <p className="text-fg1-4 font-medium">Total Doctors</p>
+            <div className="mt-3 pt-3 border-t border-bg3">
+              <Link 
+                to="/admin/doctors" 
+                className="text-bl6 hover:text-bl7 font-medium text-sm flex items-center group"
+              >
+                Manage
+                <ArrowUpRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </Link>
             </div>
           </div>
 
           {/* Active Schedules */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Active Schedules</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.activeSchedules}</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {Math.round((stats.activeSchedules / stats.totalDoctors) * 100)}% of doctors
-                </p>
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-yl1 rounded-xl">
+                <Calendar className="w-6 h-6 text-yl6" />
               </div>
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <Calendar className="w-6 h-6 text-orange-600" />
+              <div className="text-bl5 bg-bl7 px-2 py-1 rounded-lg text-sm font-bold">
+                {stats.activeSchedules}
               </div>
+            </div>
+            <h3 className="text-2xl font-bold text-fg0 mb-2">{stats.activeSchedules}</h3>
+            <p className="text-fg1-4 font-medium">Active Schedules</p>
+            <div className="mt-3 pt-3 border-t border-bg3">
+              <Link 
+                to="/admin/schedules" 
+                className="text-bl6 hover:text-bl7 font-medium text-sm flex items-center group"
+              >
+                Review
+                <ArrowUpRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </Link>
             </div>
           </div>
 
           {/* System Health */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">System Health</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">100%</p>
-                <p className="text-sm text-green-600 mt-1">All systems operational</p>
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-ppl1 rounded-xl">
+                <Shield className="w-6 h-6 text-ppl5" />
               </div>
-              <div className="p-3 bg-purple-100 rounded-xl">
-                <Shield className="w-6 h-6 text-purple-600" />
+              <div className="text-gr6 bg-gr1 px-2 py-1 rounded-lg text-sm font-bold">
+                100%
               </div>
+            </div>
+            <h3 className="text-2xl font-bold text-fg0 mb-2">100%</h3>
+            <p className="text-fg1-4 font-medium">System Health</p>
+            <div className="mt-3 pt-3 border-t border-bg3">
+              <Link 
+                to="/admin/system" 
+                className="text-bl6 hover:text-bl7 font-medium text-sm flex items-center group"
+              >
+                Monitor
+                <ArrowUpRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Management Cards */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Management</h2>
+          {/* Quick Management */}
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-fg0 flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2 text-bl6" />
+                Quick Management
+              </h2>
+              <Link 
+                to="/admin/analytics" 
+                className="text-bl6 hover:text-bl7 font-medium text-sm flex items-center group"
+              >
+                View analytics
+                <ArrowUpRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </Link>
+            </div>
             
             <div className="grid grid-cols-2 gap-4">
-              <button 
-                onClick={() => window.location.href = '/admin/users'}
-                className="p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group"
+              <Link 
+                to="/admin/users"
+                className="flex flex-col items-center p-4 bg-bl1 border border-bl2 rounded-xl hover:bg-bl2 transition-all duration-200 group"
               >
-                <Users className="w-8 h-8 text-gray-400 group-hover:text-blue-500 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-700 group-hover:text-blue-600 text-center">
-                  Manage Users
-                </p>
-              </button>
+                <Users className="w-8 h-8 text-bl6 mb-2 group-hover:scale-110 transition-transform" />
+                <p className="font-semibold text-fg0 group-hover:text-bl6">Manage Users</p>
+                <p className="text-sm text-fg1-4 text-center mt-1">{stats.totalUsers} users</p>
+              </Link>
               
-              <button 
-                onClick={() => window.location.href = '/admin/doctors'}
-                className="p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all duration-200 group"
+              <Link 
+                to="/admin/doctors"
+                className="flex flex-col items-center p-4 bg-gr1 border border-gr2 rounded-xl hover:bg-gr2 transition-all duration-200 group"
               >
-                <UserCheck className="w-8 h-8 text-gray-400 group-hover:text-green-500 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-700 group-hover:text-green-600 text-center">
-                  Manage Doctors
-                </p>
-              </button>
+                <UserCheck className="w-8 h-8 text-gr6 mb-2 group-hover:scale-110 transition-transform" />
+                <p className="font-semibold text-fg0 group-hover:text-gr6">Manage Doctors</p>
+                <p className="text-sm text-fg1-4 text-center mt-1">{stats.totalDoctors} doctors</p>
+              </Link>
               
-              <button 
-                onClick={() => window.location.href = '/admin/schedules'}
-                className="p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-all duration-200 group"
+              <Link 
+                to="/admin/schedules"
+                className="flex flex-col items-center p-4 bg-yl1 border border-yl2 rounded-xl hover:bg-yl2 transition-all duration-200 group"
               >
-                <Calendar className="w-8 h-8 text-gray-400 group-hover:text-orange-500 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-700 group-hover:text-orange-600 text-center">
-                  Schedule Management
-                </p>
-              </button>
+                <Calendar className="w-8 h-8 text-yl6 mb-2 group-hover:scale-110 transition-transform" />
+                <p className="font-semibold text-fg0 group-hover:text-yl6">Schedule Management</p>
+                <p className="text-sm text-fg1-4 text-center mt-1">{stats.activeSchedules} active</p>
+              </Link>
               
-              <button 
-                onClick={() => window.location.href = '/admin/analytics'}
-                className="p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 group"
+              <Link 
+                to="/admin/analytics"
+                className="flex flex-col items-center p-4 bg-ppl1 border border-ppl2 rounded-xl hover:bg-ppl2 transition-all duration-200 group"
               >
-                <BarChart3 className="w-8 h-8 text-gray-400 group-hover:text-purple-500 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-700 group-hover:text-purple-600 text-center">
-                  View Analytics
-                </p>
-              </button>
+                <BarChart3 className="w-8 h-8 text-ppl5 mb-2 group-hover:scale-110 transition-transform" />
+                <p className="font-semibold text-fg0 group-hover:text-ppl5">View Analytics</p>
+                <p className="text-sm text-fg1-4 text-center mt-1">System insights</p>
+              </Link>
             </div>
           </div>
 
-          {/* Recent Activity */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">System Overview</h2>
+          {/* System Overview */}
+          <div className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-fg0 flex items-center">
+                <Activity className="w-5 h-5 mr-2 text-gr6" />
+                System Overview
+              </h2>
+              <span className="text-gr6 bg-gr1 px-3 py-1 rounded-lg text-sm font-bold">
+                All Systems Go
+              </span>
+            </div>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-bl1 border border-bl2 rounded-xl">
                 <div className="flex items-center space-x-3">
-                  <Users className="w-5 h-5 text-blue-600" />
+                  <Users className="w-5 h-5 text-bl6" />
                   <div>
-                    <p className="font-medium text-gray-900">User Registrations</p>
-                    <p className="text-sm text-gray-600">{stats.totalUsers} total users</p>
+                    <p className="font-semibold text-fg0">User Registrations</p>
+                    <p className="text-sm text-fg1-4">{stats.totalUsers} total users</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-blue-600">Active</p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <UserCheck className="w-5 h-5 text-green-600" />
-                  <div>
-                    <p className="font-medium text-gray-900">Doctor Management</p>
-                    <p className="text-sm text-gray-600">{stats.totalDoctors} doctors registered</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-green-600">Active</p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Calendar className="w-5 h-5 text-orange-600" />
-                  <div>
-                    <p className="font-medium text-gray-900">Schedule Coverage</p>
-                    <p className="text-sm text-gray-600">{stats.activeSchedules} active schedules</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-orange-600">
-                    {Math.round((stats.activeSchedules / stats.totalDoctors) * 100)}%
+                  <span className="text-bl6 font-bold">Active</span>
+                  <p className="text-xs text-fg1-5 mt-1">
+                    +{getGrowthPercentage(stats.totalUsers, Math.max(0, stats.totalUsers - 5))}%
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-gr1 border border-gr2 rounded-xl">
                 <div className="flex items-center space-x-3">
-                  <Shield className="w-5 h-5 text-purple-600" />
+                  <UserCheck className="w-5 h-5 text-gr6" />
                   <div>
-                    <p className="font-medium text-gray-900">System Status</p>
-                    <p className="text-sm text-gray-600">All services operational</p>
+                    <p className="font-semibold text-fg0">Doctor Management</p>
+                    <p className="text-sm text-fg1-4">{stats.totalDoctors} doctors registered</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-purple-600">100%</p>
+                  <span className="text-gr6 font-bold">Active</span>
+                  <p className="text-xs text-fg1-5 mt-1">
+                    +{getGrowthPercentage(stats.totalDoctors, Math.max(0, stats.totalDoctors - 2))}%
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-yl1 border border-yl2 rounded-xl">
+                <div className="flex items-center space-x-3">
+                  <Calendar className="w-5 h-5 text-yl6" />
+                  <div>
+                    <p className="font-semibold text-fg0">Schedule Coverage</p>
+                    <p className="text-sm text-fg1-4">{stats.activeSchedules} active schedules</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-yl6 font-bold">
+                    {Math.round((stats.activeSchedules / stats.totalDoctors) * 100)}%
+                  </span>
+                  <p className="text-xs text-fg1-5 mt-1">Coverage rate</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-ppl1 border border-ppl2 rounded-xl">
+                <div className="flex items-center space-x-3">
+                  <Shield className="w-5 h-5 text-ppl5" />
+                  <div>
+                    <p className="font-semibold text-fg0">System Status</p>
+                    <p className="text-sm text-fg1-4">All services operational</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-ppl5 font-bold">100%</span>
+                  <p className="text-xs text-fg1-5 mt-1">Healthy</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
+        {/* Growth Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-white">
+          <div className="bg-bl6 rounded-2xl p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-100">User Growth</p>
-                <p className="text-2xl font-bold mt-1">+{getGrowthPercentage(stats.totalUsers, Math.max(0, stats.totalUsers - 5))}%</p>
+                <p className="text-bl8">User Growth</p>
+                <p className="text-2xl font-bold mt-1">
+                  +{getGrowthPercentage(stats.totalUsers, Math.max(0, stats.totalUsers - 5))}%
+                </p>
+                <p className="text-sm text-bl8 mt-2">{stats.totalUsers} total users</p>
               </div>
               <TrendingUp className="w-8 h-8" />
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
+          <div className="bg-gr5 rounded-2xl p-6 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-green-100">Doctor Growth</p>
-                <p className="text-2xl font-bold mt-1">+{getGrowthPercentage(stats.totalDoctors, Math.max(0, stats.totalDoctors - 2))}%</p>
+                <p className="text-gr8">Doctor Growth</p>
+                <p className="text-2xl font-bold mt-1">
+                  +{getGrowthPercentage(stats.totalDoctors, Math.max(0, stats.totalDoctors - 2))}%
+                </p>
+                <p className="text-sm text-gr8 mt-2">{stats.totalDoctors} total doctors</p>
               </div>
               <Stethoscope className="w-8 h-8" />
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
+          <div className="bg-ppl5 rounded-2xl p-6 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-100">Schedule Rate</p>
+                <p className="text-ppl8">Schedule Rate</p>
                 <p className="text-2xl font-bold mt-1">
                   {Math.round((stats.activeSchedules / stats.totalDoctors) * 100)}%
                 </p>
+                <p className="text-sm text-ppl8 mt-2">{stats.activeSchedules} active schedules</p>
               </div>
               <Clock className="w-8 h-8" />
             </div>
@@ -355,10 +435,10 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Refresh Button */}
-        <div className="mt-8 text-center">
+        <div className="text-center">
           <button
             onClick={fetchDashboardData}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+            className="px-6 py-3 bg-bl6 text-white rounded-xl hover:bg-bl5 transition-colors font-medium shadow-lg hover:shadow-xl"
           >
             Refresh Dashboard
           </button>

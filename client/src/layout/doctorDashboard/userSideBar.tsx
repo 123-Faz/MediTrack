@@ -50,18 +50,21 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ logoutHandle }) => {
           <SidebarMenuItem>
             <Link
               to="/"
-              className="flex items-center space-x-3 flex-1 lg:flex-none justify-center lg:justify-start min-w-0"
+              className="flex items-center space-x-2 flex-1 lg:flex-none justify-center lg:justify-start min-w-0 px-2 h-16"
             >
-              <div className="relative">
-                <Stethoscope className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
+              {/* Icon */}
+              <div className="relative flex-shrink-0">
+                <Stethoscope className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border border-white dark:border-gray-900"></div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+
+              {/* Text - Single line with truncate */}
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate">
                   MediTrack
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
-                  Healthcare Management
+                <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  Healthcare
                 </span>
               </div>
             </Link>

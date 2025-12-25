@@ -26,7 +26,8 @@ export interface IPrescriptionFile {
 
 export interface IPrescription {
   _id?: Types.ObjectId;
-  patient_id: Types.ObjectId; // Change from string to Types.ObjectId
+  appointment_id: Types.ObjectId; // Rename from patient_id to appointment_id
+  patient_id: Types.ObjectId;     // Add actual patient reference
   doctor_id: Types.ObjectId;
   medications: IMedication[];
   files: IPrescriptionFile[];
@@ -102,20 +103,29 @@ const prescriptionFileSchema: Schema = new Schema<IPrescriptionFile>({
   }
 });
 
+
+// Update the schema
 const prescriptionSchema: Schema = new Schema<IPrescriptionDocument>(
   {
-    patient_id: {
-      type: Schema.Types.ObjectId, // Change from String to ObjectId
+    appointment_id: {
+      type: Schema.Types.ObjectId,
       required: true,
-      ref: 'Appointment', // Add reference
+      ref: 'Appointment',
+      index: true
+    },
+    patient_id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
       index: true
     },
     doctor_id: {
-      type: Schema.Types.ObjectId, // Change from String to ObjectId
+      type: Schema.Types.ObjectId,
       required: true,
-      ref: 'User', // Add reference
+      ref: 'User',
       index: true
     },
+    // ... rest of your schema remains the same
     medications: {
       type: [medicationSchema],
       required: true,
@@ -157,11 +167,11 @@ const prescriptionSchema: Schema = new Schema<IPrescriptionDocument>(
   }
 );
 
-// Index for common queries
+// Update indexes
 prescriptionSchema.index({ patient_id: 1, status: 1 });
+prescriptionSchema.index({ appointment_id: 1, status: 1 });
 prescriptionSchema.index({ doctor_id: 1, status: 1 });
 prescriptionSchema.index({ expiry_date: 1 });
-
 // Auto-update status based on expiry date
 prescriptionSchema.pre<IPrescriptionDocument>('save', function (next) {
   if (this.expiry_date && this.expiry_date < new Date() && this.status === PrescriptionStatus.ACTIVE) {

@@ -1,7 +1,8 @@
 // components/NewAppointment.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-
+import type { userLayoutContextType } from "@/layout/userDashboard/types";
+import { useOutletContext } from "react-router-dom";
 // components/appointment.types.ts
 export interface AppointmentFormData {
   doctorId: string;
@@ -28,7 +29,7 @@ export interface ApiResponse {
 
 export interface Doctor {
   _id: string;
-  name: string;
+  username: string;
   specialization: string;
   email: string;
   phoneNumber: string;
@@ -42,11 +43,10 @@ export interface Doctor {
   imageUrl?: string;
 }
 
-
 // Function to get cookie value
 const getCookie = (name: string): string | null => {
   if (typeof document === 'undefined') return null;
-  
+
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
@@ -56,11 +56,11 @@ const getCookie = (name: string): string | null => {
 const NewAppointment: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Get doctorId from location state
   const doctorIdFromState = location.state?.doctorId;
   const selectedDoctorFromState = location.state?.doctor as Doctor | undefined;
-  
+
   const [formData, setFormData] = useState<AppointmentFormData>({
     doctorId: doctorIdFromState || '',
     patientName: '',
@@ -74,6 +74,11 @@ const NewAppointment: React.FC = () => {
   const [doctorsLoading, setDoctorsLoading] = useState(!doctorIdFromState);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+    const {setBreadcrumb} = useOutletContext<userLayoutContextType>();
+  
+    useEffect(() => {
+      setBreadcrumb(['Dashboard', 'New Appointments'])
+    }, [setBreadcrumb])
 
   // Fetch doctors for dropdown if no specific doctor is selected
   useEffect(() => {
@@ -86,7 +91,7 @@ const NewAppointment: React.FC = () => {
     try {
       setDoctorsLoading(true);
       const token = getCookie('token');
-      
+
       if (!token) {
         throw new Error('Authentication required. Please log in.');
       }
@@ -99,14 +104,14 @@ const NewAppointment: React.FC = () => {
         },
         credentials: 'include',
       });
-      
+
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error('Authentication failed. Please log in again.');
         }
         throw new Error('Failed to fetch doctors');
       }
-      
+
       const data = await response.json();
       setDoctors(data);
     } catch (err) {
@@ -151,7 +156,6 @@ const NewAppointment: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle validation errors from backend
         if (data.errors) {
           const errorMessages = Object.values(data.errors).join(', ');
           throw new Error(errorMessages);
@@ -160,8 +164,7 @@ const NewAppointment: React.FC = () => {
       }
 
       setSuccess('Appointment requested successfully!');
-      
-      // Reset form
+
       setFormData({
         doctorId: doctorIdFromState || '',
         patientName: '',
@@ -169,8 +172,7 @@ const NewAppointment: React.FC = () => {
         symptoms: '',
         notes: ''
       });
-      
-      // Redirect to appointments list after 2 seconds
+
       setTimeout(() => {
         navigate('/dashboard/newappoinments');
       }, 2000);
@@ -182,217 +184,176 @@ const NewAppointment: React.FC = () => {
     }
   };
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
-  // Get selected doctor details for display
-  const selectedDoctor = selectedDoctorFromState || 
-    doctors.find(doctor => doctor._id === formData.doctorId);
-
-  if (doctorsLoading) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <button
-          onClick={handleBack}
-          className="flex items-center text-blue-600 hover:text-blue-700 mb-4 transition-colors"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back
-        </button>
-        
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Book New Appointment</h1>
-        <p className="text-gray-600">Fill in the details to request an appointment</p>
-      </div>
+    <div className="min-h-screen bg-bg2 py-8 themeShift">
+      <div className="max-w-4xl mx-auto p-10">
 
-      {/* Success Message */}
-      {success && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            <span className="text-green-700">{success}</span>
-          </div>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-bl5 mb-3 ">
+            Book Your Appointment
+          </h1>
+          <p className="text-lg text-fg1-4">Schedule your consultation with healthcare experts</p>
         </div>
-      )}
 
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <span className="text-red-700">{error}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Selected Doctor Info */}
-      {selectedDoctor && (
-        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">Selected Doctor</h3>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-800 font-medium">Dr. {selectedDoctor.name}</p>
-              <p className="text-blue-600 text-sm">{selectedDoctor.specialization}</p>
-              {selectedDoctor.hospital && (
-                <p className="text-blue-600 text-sm">{selectedDoctor.hospital}</p>
-              )}
+        {/* Messages */}
+        {success && (
+          <div className="mb-6 p-4 bg-gr1 border border-gr3 rounded-xl animate-in fade-in duration-200">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-gr6 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="text-gr8 font-semibold">{success}</span>
             </div>
-            {selectedDoctor.consultationFee && (
-              <div className="text-right">
-                <p className="text-blue-800 font-semibold">
-                  ₹{selectedDoctor.consultationFee}
-                </p>
-                <p className="text-blue-600 text-sm">Consultation Fee</p>
-              </div>
-            )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Appointment Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="space-y-6">
-          {/* Doctor Selection - Only show if no pre-selected doctor */}
-          {!doctorIdFromState && (
-            <div>
-              <label htmlFor="doctorId" className="block text-sm font-medium text-gray-700 mb-2">
-                Select Doctor *
-              </label>
-              <select
-                id="doctorId"
-                name="doctorId"
-                value={formData.doctorId}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              >
-                <option value="">Choose a doctor</option>
-                {doctors.map(doctor => (
-                  <option key={doctor._id} value={doctor._id}>
-                    Dr. {doctor.name} - {doctor.specialization}
-                    {doctor.consultationFee && ` (₹${doctor.consultationFee})`}
-                  </option>
-                ))}
-              </select>
+        {error && (
+          <div className="mb-6 p-4 bg-rd1 border border-rd3 rounded-xl animate-in fade-in duration-200">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-rd6 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <span className="text-rd8 font-semibold">{error}</span>
             </div>
-          )}
-
-          {/* Patient Name */}
-          <div>
-            <label htmlFor="patientName" className="block text-sm font-medium text-gray-700 mb-2">
-              Patient Name *
-            </label>
-            <input
-              type="text"
-              id="patientName"
-              name="patientName"
-              value={formData.patientName}
-              onChange={handleInputChange}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="Enter patient's full name"
-            />
           </div>
+        )}
 
-          {/* Appointment Type */}
-          <div>
-            <label htmlFor="appointmentType" className="block text-sm font-medium text-gray-700 mb-2">
-              Appointment Type *
-            </label>
-            <select
-              id="appointmentType"
-              name="appointmentType"
-              value={formData.appointmentType}
-              onChange={handleInputChange}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            >
-              <option value="consultation">Consultation</option>
-              <option value="follow-up">Follow-up</option>
-              <option value="checkup">Routine Checkup</option>
-              <option value="emergency">Emergency</option>
-              <option value="surgery">Surgery Consultation</option>
-              <option value="therapy">Therapy Session</option>
-            </select>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* Symptoms */}
-          <div>
-            <label htmlFor="symptoms" className="block text-sm font-medium text-gray-700 mb-2">
-              Symptoms / Reason for Visit *
-            </label>
-            <textarea
-              id="symptoms"
-              name="symptoms"
-              value={formData.symptoms}
-              onChange={handleInputChange}
-              required
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical"
-              placeholder="Describe your symptoms or reason for the appointment in detail..."
-            />
-          </div>
+          {/* Appointment Form */}
+          <div className="lg:col-span-3">
+            <form onSubmit={handleSubmit} className="bg-bg1 rounded-2xl shadow-lg border border-bg2 p-6 md:p-8">
+              <div className="space-y-6">
+                Doctor Selection - Only show if no pre-selected doctor
+                {!doctorIdFromState && (
+                  <div>
+                    <label className="block text-sm font-bold text-fg0 mb-3">
+                      Select Doctor *
+                    </label>
+                    <select
+                      name="doctorId"
+                      value={formData.doctorId}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3.5 border border-bg3 bg-bg1 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift"
+                    >
+                      <option value="">Choose a doctor</option>
+                      {doctors.map(doctor => (
+                        <option key={doctor._id} value={doctor._id}>
+                          Dr. {doctor.username} - {doctor.specialization}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
-          {/* Additional Notes */}
-          <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-              Additional Notes (Optional)
-            </label>
-            <textarea
-              id="notes"
-              name="notes"
-              value={formData.notes}
-              onChange={handleInputChange}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical"
-              placeholder="Any additional information you'd like to share..."
-            />
-          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Patient Name */}
+                  <div>
+                    <label className="block text-sm font-bold text-fg0 mb-3">
+                      Patient Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="patientName"
+                      value={formData.patientName}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3.5 border border-bg3 bg-bg1 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift"
+                      placeholder="Enter patient's full name"
+                    />
+                  </div>
 
-          {/* Submit Button */}
-          <div className="flex gap-4 pt-4">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Booking...
+                  {/* Appointment Type */}
+                  <div>
+                    <label className="block text-sm font-bold text-fg0 mb-3">
+                      Appointment Type *
+                    </label>
+                    <select
+                      name="appointmentType"
+                      value={formData.appointmentType}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3.5 border border-bg3 bg-bg1 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift"
+                    >
+                      <option value="consultation">General Consultation</option>
+                      <option value="follow-up">Follow-up Visit</option>
+                      <option value="checkup">Routine Checkup</option>
+                      <option value="emergency">Emergency Consultation</option>
+                      <option value="surgery">Surgery Consultation</option>
+                      <option value="therapy">Therapy Session</option>
+                    </select>
+                  </div>
                 </div>
-              ) : (
-                'Book Appointment'
-              )}
-            </button>
+
+                {/* Symptoms */}
+                <div>
+                  <label className="block text-sm font-bold text-fg0 mb-3">
+                    Symptoms / Reason for Visit *
+                  </label>
+                  <textarea
+                    name="symptoms"
+                    value={formData.symptoms}
+                    onChange={handleInputChange}
+                    required
+                    rows={4}
+                    className="w-full px-4 py-3.5 border border-bg3 bg-bg1 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift resize-vertical"
+                    placeholder="Please describe your symptoms or reason for the appointment in detail..."
+                  />
+                </div>
+
+                {/* Additional Notes */}
+                <div>
+                  <label className="block text-sm font-bold text-fg0 mb-3">
+                    Additional Notes (Optional)
+                  </label>
+                  <textarea
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleInputChange}
+                    rows={3}
+                    className="w-full px-4 py-3.5 border border-bg3 bg-bg1 rounded-xl focus:ring-2 focus:ring-bl5 focus:border-bl5 transition-all duration-200 themeShift resize-vertical"
+                    placeholder="Any additional information, previous treatments, or specific concerns..."
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <div className="flex gap-4 pt-6">
+                  <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    disabled={loading}
+                    className="flex-1 px-6 py-3.5 border border-bg3 text-fg1-6 rounded-xl hover:bg-bg2 hover:border-bl4 hover:text-bl6 transition-all duration-200 font-semibold disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 px-6 py-3.5 bg-bl6 text-white rounded-xl hover:from-bl7 hover:to-bl8 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Processing...
+                      </div>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Confirm Appointment
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

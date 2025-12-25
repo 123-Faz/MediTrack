@@ -1,6 +1,8 @@
 // components/DoctorDashboard.tsx
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, CheckCircle, MapPin } from 'lucide-react';
+import type { userLayoutContextType } from '@/layout/userDashboard/types';
+import { useOutletContext } from 'react-router-dom';
 
 interface Schedule {
   _id: string;
@@ -112,6 +114,12 @@ const DoctorDashboard: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
+
+  const {setBreadcrumb} = useOutletContext<userLayoutContextType>();
+  
+  useEffect(() => {
+      setBreadcrumb(['Dashboard', 'Doctors Schedules'])
+    }, [setBreadcrumb])
   // Fetch schedules and appointments
   useEffect(() => {
     fetchDoctorData();
@@ -380,48 +388,48 @@ const DoctorDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-bg2 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Doctor Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage your schedules and patient appointments</p>
+          <h1 className="text-3xl font-bold text-bl5 text-center">Doctor Dashboard</h1>
+          <p className="text-bg6 text-center mt-2">Manage your schedules and patient appointments</p>
         </div>
 
         {/* Today's Schedule Card */}
         {todaySchedule && (
-          <div className="bg-white rounded-xl shadow-sm border border-green-200 p-6 mb-8">
+          <div className="bg-bg1 rounded-xl shadow-sm border border-gr2 p-6 mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Calendar className="w-6 h-6 text-green-600" />
+              <div className="p-2 bg-gr4 rounded-lg">
+                <Calendar className="w-6 h-6 text-gr6" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Today's Schedule</h2>
+              <h2 className="text-xl font-semibold text-bg9">Today's Schedule</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                <Clock className="w-5 h-5 text-green-600" />
+              <div className="flex items-center gap-3 p-3 bg-gr4 rounded-lg">
+                <Clock className="w-5 h-5 text-gr6" />
                 <div>
-                  <p className="text-sm text-gray-600">Working Hours</p>
-                  <p className="font-semibold text-gray-900">
+                  <p className="text-sm text-bg8">Working Hours</p>
+                  <p className="font-semibold text-bg9">
                     {formatTimeTo12Hour(todaySchedule.startTime)} - {formatTimeTo12Hour(todaySchedule.endTime)}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                <Users className="w-5 h-5 text-blue-600" />
+              <div className="flex items-center gap-3 p-3 bg-bl4 rounded-lg">
+                <Users className="w-5 h-5 text-bl6" />
                 <div>
-                  <p className="text-sm text-gray-600">Pending Appointments</p>
-                  <p className="font-semibold text-gray-900">{pendingAppointments.length}</p>
+                  <p className="text-sm text-bg8">Pending Appointments</p>
+                  <p className="font-semibold text-bg9">{pendingAppointments.length}</p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                <MapPin className="w-5 h-5 text-purple-600" />
+              <div className="flex items-center gap-3 p-3 bg-ppl4 rounded-lg">
+                <MapPin className="w-5 h-5 text-ppl6" />
                 <div>
-                  <p className="text-sm text-gray-600">Confirmed Today</p>
-                  <p className="font-semibold text-gray-900">{getTodayConfirmedAppointments()}</p>
+                  <p className="text-sm text-bg8">Confirmed Today</p>
+                  <p className="font-semibold text-bg9">{getTodayConfirmedAppointments()}</p>
                 </div>
               </div>
             </div>
@@ -429,69 +437,69 @@ const DoctorDashboard: React.FC = () => {
         )}
 
         {!todaySchedule && schedules.length > 0 && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8">
+          <div className="bg-yl1 border border-yl2 rounded-xl p-6 mb-8">
             <div className="flex items-center gap-3">
-              <Calendar className="w-6 h-6 text-yellow-600" />
+              <Calendar className="w-6 h-6 text-yl6" />
               <div>
-                <h3 className="text-lg font-semibold text-yellow-800">No Schedule for Today</h3>
-                <p className="text-yellow-700">You don't have a schedule set for today.</p>
+                <h3 className="text-lg font-semibold text-yl8">No Schedule for Today</h3>
+                <p className="text-yl7">You don't have a schedule set for today.</p>
               </div>
             </div>
           </div>
         )}
 
         {/* Pending Appointments Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-bg1 rounded-xl shadow-sm border border-bg4 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Pending Appointments</h2>
-            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+            <h2 className="text-xl font-semibold text-bg9">Pending Appointments</h2>
+            <span className="bg-bl2 text-bl7 px-3 py-1 rounded-full text-sm font-medium">
               {pendingAppointments.length} requests
             </span>
           </div>
 
           {pendingAppointments.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No pending appointments</h3>
-              <p className="text-gray-500">All appointments have been confirmed</p>
+              <Users className="w-16 h-16 text-bg4 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-bg9 mb-2">No pending appointments</h3>
+              <p className="text-bg5">All appointments have been confirmed</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {pendingAppointments.map((appointment) => (
                 <div
                   key={appointment._id}
-                  className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                  className="border border-bg4 rounded-lg p-6 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="font-semibold text-gray-900 text-lg">
+                      <h3 className="font-semibold text-bg9 text-lg">
                         {appointment.patientName}
                       </h3>
-                      <span className="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium mt-1">
+                      <span className="inline-block bg-yl1 text-yl8 px-2 py-1 rounded text-xs font-medium mt-1">
                         {appointment.appointmentType}
                       </span>
                     </div>
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Users className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-bl1 rounded-full flex items-center justify-center">
+                      <Users className="w-5 h-5 text-bl4" />
                     </div>
                   </div>
 
                   <div className="space-y-2 mb-4">
                     <div>
-                      <p className="text-sm text-gray-600">Symptoms</p>
-                      <p className="text-sm text-gray-900 line-clamp-2">
+                      <p className="text-sm text-bg6">Symptoms</p>
+                      <p className="text-sm text-bg9 line-clamp-2">
                         {appointment.symptoms}
                       </p>
                     </div>
                     {appointment.notes && (
                       <div>
-                        <p className="text-sm text-gray-600">Notes</p>
-                        <p className="text-sm text-gray-900">{appointment.notes}</p>
+                        <p className="text-sm text-bg6">Notes</p>
+                        <p className="text-sm text-gb9">{appointment.notes}</p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                  <div className="flex items-center justify-between text-sm text-bg5 mb-4">
                     <span>
                       {new Date(appointment.createdAt).toLocaleDateString()}
                     </span>
@@ -502,7 +510,7 @@ const DoctorDashboard: React.FC = () => {
 
                   <button
                     onClick={() => handleConfirmClick(appointment)}
-                    className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-gr6 text-bg1 py-2 px-4 rounded-lg hover:bg-gr7 transition-colors flex items-center justify-center gap-2"
                   >
                     <CheckCircle className="w-4 h-4" />
                     Confirm Appointment
@@ -515,19 +523,19 @@ const DoctorDashboard: React.FC = () => {
 
         {/* Calendar Modal */}
         {showCalendar && selectedAppointment && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-xl font-semibold text-gray-900">
+          <div className="fixed inset-0 bg-bg1/80 bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-bg3 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-bg2">
+                <h3 className="text-xl font-semibold text-bg9">
                   Confirm Appointment for {selectedAppointment.patientName}
                 </h3>
-                <p className="text-gray-600 mt-1">Select date and time slot</p>
+                <p className="text-bg6 mt-1">Select date and time slot</p>
               </div>
 
               <div className="p-6">
                 {/* Date Selection */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-bg7 mb-2">
                     Select Date
                   </label>
                   <input
@@ -535,14 +543,14 @@ const DoctorDashboard: React.FC = () => {
                     value={selectedDate}
                     onChange={(e) => handleDateSelect(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-bg4 rounded-lg focus:ring-2 focus:ring-bl6 focus:border-bl6"
                   />
                 </div>
 
                 {/* Time Slots */}
                 {timeSlots.length > 0 ? (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-bg7 mb-2">
                       Available Time Slots (15 min each)
                     </label>
                     <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto">
@@ -552,8 +560,8 @@ const DoctorDashboard: React.FC = () => {
                           onClick={() => setSelectedTime(slot.time)}
                           className={`p-3 rounded-lg border transition-colors ${
                             selectedTime === slot.time
-                              ? 'bg-blue-600 text-white border-blue-600'
-                              : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
+                              ? 'bg-bl6 text-bg9 border-bl6'
+                              : 'bg-bg1 text-bg6 border-bg3 hover:border-bl6'
                           } ${!slot.available && 'opacity-50 cursor-not-allowed'}`}
                           disabled={!slot.available}
                         >
@@ -563,7 +571,7 @@ const DoctorDashboard: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-bg5">
                     No available slots for selected date
                   </div>
                 )}
@@ -577,14 +585,14 @@ const DoctorDashboard: React.FC = () => {
                       setSelectedTime('');
                       setSelectedDate('');
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-4 py-2 border border-bg3 bg-bg2 text-bg7 rounded-lg hover:bg-bg1 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={confirmAppointment}
                     disabled={!selectedTime}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 bg-bl6 text-bg9 rounded-lg hover:bg-bl6 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Confirm
                   </button>

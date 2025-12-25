@@ -19,16 +19,15 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onViewDetails }) => {
     });
   };
   return (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+    <div className="bg-bg1 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-bg1 overflow-hidden text-forgound">
       {/* Profile Image Section */}
       <div className="flex justify-center pt-6">
         <div className="relative">
           <img
             src={doctor.profileImage || "/default-avatar.png"}
-            alt={`Dr. ${doctor.username}`}
-            className="w-24 h-24 rounded-full object-cover border-4 border-blue-50 shadow-md"
+            className="w-24 h-24 rounded-full object-cover border-4 bg-bl1 border-bl1 shadow-md"
           />
-          <div className="absolute bottom-2 right-2 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+          <div className="absolute bottom-2 right-2 w-3 h-3 bg-gr5 rounded-full border-2 border-bg1"></div>
         </div>
       </div>
 

@@ -32,7 +32,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ isOpen, onClose }) => {
       dispatch(setAdminCredentials(data));
       toast.success("Admin Login Successful!");
       reset();
-      navigate("/admin-dashboard");
+      navigate("/adDashboard");
       onClose();
     },
     onError: (error: any) => {

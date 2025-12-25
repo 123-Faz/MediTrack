@@ -68,7 +68,7 @@ const adminSchema: Schema = new Schema<IAdmin>(
         },
     },
     {
-        collection: "users",
+        collection: "admins",
         timestamps: true
     }
 )

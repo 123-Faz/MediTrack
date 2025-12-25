@@ -40,16 +40,16 @@ const items = [
     url: "/adDashboard/myUsers",
     icon: User,
   },
-  {
-    title: "Profile",
-    url: "/adDashboard/profile",
-    icon: User,
-  },
-  {
-    title: "Notifications",
-    url: "/dashboard/notifications",
-    icon: AlertCircle,
-  }
+  // {
+  //   title: "Profile",
+  //   url: "/adDashboard/profile",
+  //   icon: User,
+  // },
+  // {
+  //   title: "Notifications",
+  //   url: "/dashboard/notifications",
+  //   icon: AlertCircle,
+  // }
 ];
 
 const UserSidebarNav = () => {
@@ -57,7 +57,7 @@ const UserSidebarNav = () => {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-2xl font-bold">User Dashboard</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-2xl font-bold">Admin Dashboard</SidebarGroupLabel>
       <SidebarGroupContent >
         <SidebarMenu>
   {items.map((item) => {
