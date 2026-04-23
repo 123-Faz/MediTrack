@@ -3,7 +3,6 @@ import type { userLayoutContextType } from '@/layout/userDashboard/types';
 import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, Phone, Stethoscope, AlertCircle, CheckCircle2, Search } from 'lucide-react';
-
 interface Appointment {
   _id: string;
   user: {

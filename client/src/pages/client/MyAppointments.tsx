@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { userLayoutContextType } from "@/layout/userDashboard/types";
 import { useOutletContext } from "react-router-dom";
+
 // components/appointment.types.ts
 export interface DoctorInfo {
   _id: string;
@@ -30,6 +31,8 @@ export interface Appointment {
   status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed';
   createdAt: string;
   updatedAt: string;
+  appointmentDate: string;
+  appointmentTime: string;
 }
 
 export interface AppointmentsResponse {
@@ -38,8 +41,6 @@ export interface AppointmentsResponse {
   count: number;
   data: Appointment[];
 }
-// components/MyAppointments.tsx
-
 
 // Function to get cookie value
 const getCookie = (name: string): string | null => {
@@ -57,11 +58,12 @@ const MyAppointments: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [refreshing, setRefreshing] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const {setBreadcrumb} = useOutletContext<userLayoutContextType>();
+  const { setBreadcrumb } = useOutletContext<userLayoutContextType>();
 
   useEffect(() => {
-    setBreadcrumb(['Dashboard', 'My Appointments'])
-  }, [setBreadcrumb])
+    setBreadcrumb(['Dashboard', 'My Appointments']);
+  }, [setBreadcrumb]);
+
   useEffect(() => {
     fetchUserAppointments();
   }, []);
@@ -70,7 +72,7 @@ const MyAppointments: React.FC = () => {
     try {
       setLoading(true);
       setError('');
-      
+
       const token = getCookie('token');
       if (!token) {
         throw new Error('Authentication required. Please log in.');
@@ -157,6 +159,21 @@ const MyAppointments: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return 'Not scheduled';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        weekday: 'short',
+      });
+    } catch {
+      return 'Invalid date';
+    }
+  };
+
+  const formatDateTime = (dateString: string) => {
+    if (!dateString) return 'Not scheduled';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -166,19 +183,69 @@ const MyAppointments: React.FC = () => {
     });
   };
 
+  const formatTime = (timeString: string) => {
+    if (!timeString) return 'Not specified';
+    // Convert "10:30" to "10:30 AM"
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${minutes} ${ampm}`;
+  };
+
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
     return `${Math.floor(diffInHours / 168)}w ago`;
   };
 
-  const filteredAppointments = filterStatus === 'all' 
-    ? appointments 
+  const getUpcomingStatus = (appointmentDate: string, status: string) => {
+    if (status !== 'approved') return '';
+    if (!appointmentDate) return '';
+
+    const now = new Date();
+    const appointment = new Date(appointmentDate);
+    const diffInDays = Math.floor((appointment.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffInDays < 0) return 'past';
+    if (diffInDays === 0) return 'today';
+    if (diffInDays <= 7) return 'upcoming';
+    return '';
+  };
+
+  const getUpcomingBadgeColor = (status: string) => {
+    switch (status) {
+      case 'today':
+        return 'bg-yl1 text-yl8 border-yl2';
+      case 'upcoming':
+        return 'bg-bl1 text-bl8 border-bl2';
+      case 'past':
+        return 'bg-bg1 text-bg8 border-bg2';
+      default:
+        return '';
+    }
+  };
+
+  const getUpcomingBadgeText = (status: string) => {
+    switch (status) {
+      case 'today':
+        return 'Today';
+      case 'upcoming':
+        return 'Upcoming';
+      case 'past':
+        return 'Past';
+      default:
+        return '';
+    }
+  };
+
+  const filteredAppointments = filterStatus === 'all'
+    ? appointments
     : appointments.filter(apt => apt.status === filterStatus);
 
   const statusCounts = {
@@ -190,9 +257,13 @@ const MyAppointments: React.FC = () => {
     cancelled: appointments.filter(apt => apt.status === 'cancelled').length,
   };
 
+  const upcomingAppointments = appointments.filter(apt =>
+    apt.status === 'approved' && apt.appointmentDate
+  );
+
   if (loading) {
     return (
-      <div className="min-h-screen text-forground bg-bg1 py-8">
+      <div className="min-h-screen text-foreground bg-bg1 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bl6"></div>
@@ -209,7 +280,8 @@ const MyAppointments: React.FC = () => {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div className="mb-4 sm:mb-0">
-              <p className="text-bl5 text-2xl font-bold mb-2 text-center">Manage and track your medical appointments</p>
+              <h1 className="text-3xl font-bold text-bg9 mb-2">My Appointments</h1>
+              <p className="text-bg6">Manage and track your medical appointments</p>
             </div>
             <div className="flex gap-3">
               <button
@@ -217,10 +289,10 @@ const MyAppointments: React.FC = () => {
                 disabled={refreshing}
                 className="flex items-center px-4 py-2 border border-bg3 rounded-lg text-bg7 bg-bg2 hover:bg-bg3 transition-colors disabled:opacity-50"
               >
-                <svg 
-                  className={`w-5 h-5 mr-2 ${refreshing ? 'animate-spin' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  className={`w-5 h-5 mr-2 ${refreshing ? 'animate-spin' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -229,7 +301,7 @@ const MyAppointments: React.FC = () => {
               </button>
               <button
                 onClick={handleBookNew}
-                className="flex items-center px-6 py-2 bg-bl5 text-bg1 rounded-lg hover:bg-bl7 transition-colors"
+                className="flex items-center px-6 py-2 bg-bl5 text-bg1 rounded-lg hover:bg-bl7 transition-colors shadow-sm"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -255,16 +327,16 @@ const MyAppointments: React.FC = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           {[
-            { status: 'all', label: 'Total', color: 'bg-bg5' },
-            { status: 'pending', label: 'Pending', color: 'bg-yl5' },
-            { status: 'approved', label: 'Approved', color: 'bg-gr5' },
-            { status: 'completed', label: 'Completed', color: 'bg-bl5' },
-            { status: 'rejected', label: 'Rejected', color: 'bg-rd5' },
-            { status: 'cancelled', label: 'Cancelled', color: 'bg-bg4' },
-          ].map(({ status, label, color }) => (
+            { status: 'all', label: 'Total', color: 'bg-bg5', icon: '📊' },
+            { status: 'pending', label: 'Pending', color: 'bg-yl5', icon: '⏳' },
+            { status: 'approved', label: 'Approved', color: 'bg-gr5', icon: '✅' },
+            { status: 'completed', label: 'Completed', color: 'bg-bl5', icon: '🎉' },
+            { status: 'rejected', label: 'Rejected', color: 'bg-rd5', icon: '❌' },
+            { status: 'cancelled', label: 'Cancelled', color: 'bg-bg4', icon: '🚫' },
+          ].map(({ status, label, color, icon }) => (
             <div
               key={status}
-              className={`bg-bg1 rounded-lg shadow-sm border border-bg2 p-4 cursor-pointer transition-all hover:shadow-md ${
+              className={`bg-bg1 rounded-lg shadow-sm border border-bg2 p-4 cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 ${
                 filterStatus === status ? 'ring-2 ring-bl5' : ''
               }`}
               onClick={() => setFilterStatus(status)}
@@ -274,11 +346,75 @@ const MyAppointments: React.FC = () => {
                   <p className="text-2xl font-bold text-bg9">{statusCounts[status as keyof typeof statusCounts]}</p>
                   <p className="text-sm text-bg6">{label}</p>
                 </div>
-                <div className={`w-3 h-3 rounded-full ${color}`}></div>
+                <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center text-white`}>
+                  <span className="text-lg">{icon}</span>
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {/* Upcoming Appointments Section */}
+        {upcomingAppointments.length > 0 && filterStatus === 'all' && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-bg9">Upcoming Appointments</h2>
+              <span className="text-sm text-bg5">{upcomingAppointments.length} scheduled</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {upcomingAppointments.slice(0, 3).map((appointment) => {
+                const upcomingStatus = getUpcomingStatus(appointment.appointmentDate, appointment.status);
+                return (
+                  <div
+                    key={appointment._id}
+                    className="bg-bg1 rounded-lg shadow-sm border border-bg2 p-4 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center">
+                        {appointment.doctor.imageUrl ? (
+                          <img
+                            src={appointment.doctor.imageUrl}
+                            alt={appointment.doctor.username}
+                            className="w-10 h-10 rounded-full object-cover mr-3"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-bl4 rounded-full flex items-center justify-center mr-3">
+                            <svg className="w-5 h-5 text-bl6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                        )}
+                        <div>
+                          <h3 className="font-semibold text-bg9">Dr. {appointment.doctor.username}</h3>
+                          <p className="text-xs text-bg6">{appointment.doctor.specialization}</p>
+                        </div>
+                      </div>
+                      {upcomingStatus && (
+                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${getUpcomingBadgeColor(upcomingStatus)}`}>
+                          {getUpcomingBadgeText(upcomingStatus)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center text-sm">
+                        <svg className="w-4 h-4 text-bg5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span className="text-bg7">{formatDate(appointment.appointmentDate)}</span>
+                      </div>
+                      <div className="flex items-center text-sm">
+                        <svg className="w-4 h-4 text-bg5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-bg7">{formatTime(appointment.appointmentTime)}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Appointments List */}
         {filteredAppointments.length === 0 ? (
@@ -290,14 +426,14 @@ const MyAppointments: React.FC = () => {
               {appointments.length === 0 ? 'No appointments yet' : 'No appointments found'}
             </h3>
             <p className="text-bg5 mb-6">
-              {appointments.length === 0 
+              {appointments.length === 0
                 ? 'Get started by booking your first appointment with our doctors.'
                 : `No appointments found with status "${filterStatus}".`
               }
             </p>
             <button
               onClick={handleBookNew}
-              className="inline-flex items-center px-6 py-3 bg-bl6 text-bg1 rounded-lg hover:bg-bl7 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-bl6 text-bg1 rounded-lg hover:bg-bl7 transition-colors shadow-sm"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -307,105 +443,190 @@ const MyAppointments: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {filteredAppointments.map((appointment) => (
-              <div
-                key={appointment._id}
-                className="bg-bg1 rounded-lg shadow-sm border border-bg2 hover:shadow-md transition-shadow duration-200"
-              >
-                <div className="p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    {/* Doctor Info */}
-                    <div className="flex-1">
-                      <div className="flex items-start gap-4">
-                        {appointment.doctor.imageUrl ? (
-                          <img
-                            src={appointment.doctor.imageUrl}
-                            alt={appointment.doctor.username}
-                            className="w-16 h-16 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="w-16 h-16 bg-bl4 rounded-lg flex items-center justify-center">
-                            <svg className="w-8 h-8 text-bl6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                          </div>
-                        )}
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <h3 className="text-xl font-semibold text-bg9">
-                              Dr. {appointment.doctor.username}
-                            </h3>
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
-                              <span className="mr-1">{getStatusIcon(appointment.status)}</span>
-                              {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                            </span>
-                          </div>
-                          <p className="text-bg6 mb-1">{appointment.doctor.specialization}</p>
-                          {appointment.doctor.hospital && (
-                            <p className="text-bg5 text-sm">{appointment.doctor.hospital}</p>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-bg9">
+                Appointments ({filteredAppointments.length})
+                {filterStatus !== 'all' && ` - ${filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}`}
+              </h2>
+              <div className="text-sm text-bg5">
+                Sorted by: <span className="font-medium text-bg7">Recently booked</span>
+              </div>
+            </div>
+
+            {filteredAppointments.map((appointment) => {
+              const upcomingStatus = getUpcomingStatus(appointment.appointmentDate, appointment.status);
+
+              return (
+                <div
+                  key={appointment._id}
+                  className="bg-bg1 rounded-lg shadow-sm border border-bg2 hover:shadow-md transition-all duration-200 overflow-hidden"
+                >
+                  <div className="p-6">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                      {/* Left Column - Doctor Info & Status */}
+                      <div className="lg:w-2/5">
+                        <div className="flex items-start gap-4">
+                          {/* Doctor Avatar */}
+                          {appointment.doctor.imageUrl ? (
+                            <img
+                              src={appointment.doctor.imageUrl}
+                              alt={appointment.doctor.username}
+                              className="w-20 h-20 rounded-xl object-cover border-2 border-bg2"
+                            />
+                          ) : (
+                            <div className="w-20 h-20 bg-gradient-to-br from-bl4 to-bl6 rounded-xl flex items-center justify-center">
+                              <svg className="w-10 h-10 text-bg1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                            </div>
                           )}
-                          {appointment.doctor.consultationFee && (
-                            <p className="text-gr6 font-semibold mt-1">
-                              ₹{appointment.doctor.consultationFee} Consultation Fee
-                            </p>
-                          )}
+
+                          {/* Doctor Details */}
+                          <div className="flex-1">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <h3 className="text-xl font-bold text-bg9">
+                                Dr. {appointment.doctor.username}
+                              </h3>
+                              <div className="flex items-center gap-2">
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
+                                  <span className="mr-1">{getStatusIcon(appointment.status)}</span>
+                                  {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                                </span>
+                                {upcomingStatus && (
+                                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getUpcomingBadgeColor(upcomingStatus)}`}>
+                                    {getUpcomingBadgeText(upcomingStatus)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <p className="text-bg6 mb-1">{appointment.doctor.specialization}</p>
+
+                            {appointment.doctor.hospital && (
+                              <div className="flex items-center text-sm text-bg5 mb-1">
+                                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                {appointment.doctor.hospital}
+                              </div>
+                            )}
+
+                            {appointment.doctor.consultationFee && (
+                              <div className="flex items-center text-sm">
+                                <svg className="w-4 h-4 text-gr5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="font-semibold text-gr6">
+                                  ₹{appointment.doctor.consultationFee} Consultation Fee
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Patient Info */}
+                        <div className="mt-6 p-4 bg-bg2 rounded-lg">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm text-bg5 mb-1">Patient Name</p>
+                              <p className="font-medium text-bg9">{appointment.patientName}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-bg5 mb-1">Appointment Type</p>
+                              <span className={`inline-block px-3 py-1 rounded text-sm font-medium ${getAppointmentTypeColor(appointment.appointmentType)}`}>
+                                {appointment.appointmentType.replace('-', ' ').toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Appointment Details */}
-                    <div className="lg:w-80 space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-bg5">Patient:</span>
-                        <span className="font-medium text-bg9">{appointment.patientName}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-bg5">Type:</span>
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${getAppointmentTypeColor(appointment.appointmentType)}`}>
-                          {appointment.appointmentType.replace('-', ' ').toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-bg5">Booked:</span>
-                        <span className="font-medium text-bg9" title={formatDate(appointment.createdAt)}>
-                          {getTimeAgo(appointment.createdAt)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                      {/* Right Column - Appointment Details */}
+                      <div className="lg:w-3/5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Schedule Information */}
+                          <div className="space-y-4">
+                            <h4 className="text-sm font-semibold text-bg7 flex items-center">
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              Schedule
+                            </h4>
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center p-3 bg-bg2 rounded-lg">
+                                <div>
+                                  <p className="text-xs text-bg5">Appointment Date</p>
+                                  <p className={`font-medium ${appointment.appointmentDate ? 'text-bg9' : 'text-bg5'}`}>
+                                    {formatDate(appointment.appointmentDate)}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-xs text-bg5">Appointment Time</p>
+                                  <p className={`font-medium ${appointment.appointmentTime ? 'text-bg9' : 'text-bg5'}`}>
+                                    {formatTime(appointment.appointmentTime)}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="p-3 bg-bg2 rounded-lg">
+                                  <p className="text-xs text-bg5">Booked On</p>
+                                  <p className="font-medium text-bg9" title={formatDateTime(appointment.createdAt)}>
+                                    {getTimeAgo(appointment.createdAt)}
+                                  </p>
+                                </div>
+                                <div className="p-3 bg-bg2 rounded-lg">
+                                  <p className="text-xs text-bg5">Last Updated</p>
+                                  <p className="font-medium text-bg9" title={formatDateTime(appointment.updatedAt)}>
+                                    {getTimeAgo(appointment.updatedAt)}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
 
-                  {/* Symptoms and Notes */}
-                  <div className="mt-6 pt-6 border-t border-bg1">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="text-sm font-medium text-bg7 mb-2">Symptoms / Reason</h4>
-                        <p className="text-sm text-b3g6 bg-bg1 rounded-lg p-3">
-                          {appointment.symptoms}
-                        </p>
-                      </div>
-                      {appointment.notes && (
-                        <div>
-                          <h4 className="text-sm font-medium text-bg7 mb-2">Additional Notes</h4>
-                          <p className="text-sm text-bg6 bg-bg1 rounded-lg p-3">
-                            {appointment.notes}
-                          </p>
+                          {/* Medical Information */}
+                          <div className="space-y-4">
+                            <h4 className="text-sm font-semibold text-bg7 flex items-center">
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              Medical Details
+                            </h4>
+                            <div className="space-y-3">
+                              <div className="bg-bg2 rounded-lg p-4">
+                                <p className="text-xs text-bg5 mb-2">Symptoms / Reason for Visit</p>
+                                <p className="text-sm text-bg9">{appointment.symptoms}</p>
+                              </div>
+                              {appointment.notes && (
+                                <div className="bg-bg2 rounded-lg p-4">
+                                  <p className="text-xs text-bg5 mb-2">Additional Notes</p>
+                                  <p className="text-sm text-bg9">{appointment.notes}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  </div>
 
-                  {/* Footer */}
-                  <div className="mt-6 pt-6 border-t border-bg1 flex items-center justify-between text-sm text-bg5">
-                    <div>
-                      Appointment ID: <span className="font-mono">{appointment._id.slice(-8)}</span>
-                    </div>
-                    <div title={formatDate(appointment.createdAt)}>
-                      Created: {formatDate(appointment.createdAt)}
+                        {/* Footer - ID and Actions */}
+                        <div className="mt-6 pt-6 border-t border-bg2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="text-sm text-bg5">
+                            Appointment ID: <span className="font-mono text-bg7">{appointment._id.slice(-8)}</span>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm">
+                            <div className="text-bg5">
+                              Created: <span className="text-bg7">{formatDate(appointment.createdAt)}</span>
+                            </div>
+                            <div className="text-bg5">
+                              Updated: <span className="text-bg7">{formatDate(appointment.updatedAt)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
