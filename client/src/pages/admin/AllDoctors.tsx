@@ -78,7 +78,7 @@ const AdminDashboard: React.FC = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:8000/api/v1/admin/get-all-drs', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/get-all-drs`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -188,7 +188,7 @@ const AdminDashboard: React.FC = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:8000/api/v1/admin/schedules', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/schedules`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

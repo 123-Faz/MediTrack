@@ -136,10 +136,10 @@ const DoctorDashboard: React.FC = () => {
       }
 
       const [schedulesRes, appointmentsRes] = await Promise.all([
-        fetch('http://localhost:8000/api/v1/auth_doctor/all-scd', {
+        fetch(`${import.meta.env.VITE_API_URL}/auth_doctor/all-scd`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch('http://localhost:8000/api/v1/auth_doctor/all-appointments', {
+        fetch(`${import.meta.env.VITE_API_URL}/auth_doctor/all-appointments`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -322,7 +322,7 @@ const DoctorDashboard: React.FC = () => {
 
       console.log('Sending confirmation request:', requestPayload);
 
-      const response = await fetch('http://localhost:8000/api/v1/auth_doctor/confrim-appointments', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth_doctor/confrim-appointments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

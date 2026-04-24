@@ -2,26 +2,37 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
-import { PatientLogin } from "@/pages/client/auth/Login";
-import { DoctorLogin } from "@/pages/doctor/auth/Login";
-import { AdminLogin } from "@/pages/admin/auth/Login";
+import { UnifiedLogin } from "@/components/auth/UnifiedLogin";
+import { PatientRegister } from "@/pages/client/auth/Register";
 
 const MainLayout = () => {
-  const [selectedRole, setSelectedRole] = useState<'patient' | 'doctor' | 'admin' | null>(null);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
-  const handleRoleSelect = (role: 'patient' | 'doctor' | 'admin') => {
-    console.log("Role selected:", role);
-    setSelectedRole(role);
+  const handleLoginOpen = () => {
+    setIsLoginOpen(true);
+    setIsRegisterOpen(false);
   };
 
   const handleLoginClose = () => {
-    setSelectedRole(null);
+    setIsLoginOpen(false);
+    setIsRegisterOpen(false);
+  };
+
+  const handleSwitchToRegister = () => {
+    setIsLoginOpen(false);
+    setIsRegisterOpen(true);
+  };
+
+  const handleSwitchToLogin = () => {
+    setIsRegisterOpen(false);
+    setIsLoginOpen(true);
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Pass the role selection handler to Header */}
-      <Header onRoleSelect={handleRoleSelect} />
+    <div className="flex flex-col min-h-screen themeShift">
+      {/* Pass the login trigger to Header */}
+      <Header onLoginClick={handleLoginOpen} />
 
       <main className="flex-grow">
         <Outlet />
@@ -29,30 +40,19 @@ const MainLayout = () => {
 
       <Footer />
 
-      {/* Render the selected login component */}
-      {selectedRole === 'patient' && (
-        <PatientLogin 
-          isOpen={true} 
-          onClose={handleLoginClose}
-          onSwitchToRegister={() => {
-            console.log("Switch to patient register");
-          }}
-        />
-      )}
+      {/* Unified Login Component */}
+      <UnifiedLogin 
+        isOpen={isLoginOpen} 
+        onClose={handleLoginClose}
+        onSwitchToRegister={handleSwitchToRegister}
+      />
 
-      {selectedRole === 'doctor' && (
-        <DoctorLogin 
-          isOpen={true} 
-          onClose={handleLoginClose}
-        />
-      )}
-
-      {selectedRole === 'admin' && (
-        <AdminLogin 
-          isOpen={true} 
-          onClose={handleLoginClose}
-        />
-      )}
+      {/* Patient Register Component */}
+      <PatientRegister 
+        isOpen={isRegisterOpen} 
+        onClose={handleLoginClose}
+        onSwitchToLogin={handleSwitchToLogin}
+      />
     </div>
   );
 };

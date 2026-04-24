@@ -85,7 +85,7 @@ const MyPrescriptions: React.FC = () => {
         throw new Error('Authentication required. Please log in.');
       }
 
-      let url = 'http://localhost:8000/api/v1/user/psp';
+      let url = `${import.meta.env.VITE_API_URL}/user/psp`;
       if (selectedAppointment) {
         url += `?appointment_id=${selectedAppointment}`;
       }
@@ -183,7 +183,7 @@ const MyPrescriptions: React.FC = () => {
 
   const downloadFile = async (file: PrescriptionFile) => {
     try {
-      const response = await fetch(`http://localhost:8000${file.url}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL.replace('/api/v1', '')}${file.url}`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

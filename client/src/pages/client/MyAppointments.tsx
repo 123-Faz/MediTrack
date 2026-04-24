@@ -79,7 +79,7 @@ const MyAppointments: React.FC = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8000/api/v1/user/appt`,
+        `${import.meta.env.VITE_API_URL}/user/appt`,
         {
           method: 'GET',
           headers: {

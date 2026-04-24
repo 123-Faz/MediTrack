@@ -71,7 +71,7 @@ const DoctorManagement: React.FC = () => {
         throw new Error('Authentication required. Please log in.');
       }
 
-      const response = await fetch('http://localhost:8000/api/v1/user/get-all-drs', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/get-all-drs`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -319,7 +319,7 @@ const DoctorManagement: React.FC = () => {
           throw new Error('Authentication required. Please log in.');
         }
 
-        const response = await fetch('http://localhost:8000/api/v1/user/req-appt', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user/req-appt`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

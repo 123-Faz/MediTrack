@@ -59,13 +59,13 @@ const AdminDashboard: React.FC = () => {
 
       // Fetch users and doctors data
       const [usersResponse, doctorsResponse] = await Promise.all([
-        fetch('http://localhost:8000/api/v1/admin/users', {
+        fetch(`${import.meta.env.VITE_API_URL}/admin/users`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         }),
-        fetch('http://localhost:8000/api/v1/admin/get-all-drs', {
+        fetch(`${import.meta.env.VITE_API_URL}/admin/get-all-drs`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

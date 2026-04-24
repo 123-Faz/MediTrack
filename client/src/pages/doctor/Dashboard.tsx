@@ -6,14 +6,9 @@ import {
   Calendar, 
   Users, 
   Clock, 
-  TrendingUp, 
-  Stethoscope,
   Activity,
   Pill,
   FileText,
-  Search,
-  Bell,
-  Menu
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -62,7 +57,7 @@ const DoctorDashboard: React.FC = () => {
       }
 
       // Fetch appointments data
-      const appointmentsResponse = await fetch('http://localhost:8000/api/v1/auth_doctor/all-appointments', {
+      const appointmentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/auth_doctor/all-appointments`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

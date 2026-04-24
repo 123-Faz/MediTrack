@@ -88,7 +88,7 @@ const UserDashboard: React.FC = () => {
       }
 
       // Fetch appointments
-      const appointmentsResponse = await fetch('http://localhost:8000/api/v1/user/appt', {
+      const appointmentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/user/appt`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -96,7 +96,7 @@ const UserDashboard: React.FC = () => {
       const appointments = appointmentsData.data || [];
 
       // Fetch prescriptions
-      const prescriptionsResponse = await fetch('http://localhost:8000/api/v1/user/psp', {
+      const prescriptionsResponse = await fetch(`${import.meta.env.VITE_API_URL}/user/psp`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       

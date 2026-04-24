@@ -71,7 +71,7 @@ const UserManagement: React.FC = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:8000/api/v1/admin/users', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/users`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -153,7 +153,7 @@ const UserManagement: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:8000/api/v1/admin/users/${selectedUser._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/users/${selectedUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ const UserManagement: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:8000/api/v1/admin/users/${selectedUser._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/users/${selectedUser._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

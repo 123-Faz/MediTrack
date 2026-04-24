@@ -82,7 +82,7 @@ const TreatmentManagement: React.FC = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:8000/api/v1/auth_doctor/all-appointments', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth_doctor/all-appointments`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -296,7 +296,7 @@ const TreatmentManagement: React.FC = () => {
         formData.append('files', file);
       });
 
-      const response = await fetch('http://localhost:8000/api/v1/auth_doctor/psp', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth_doctor/psp`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
