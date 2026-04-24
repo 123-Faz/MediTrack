@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
-import { UnifiedLogin } from "@/components/auth/UnifiedLogin";
-import { PatientRegister } from "@/pages/client/auth/Register";
+import { UnifiedLogin } from "../components/auth/UnifiedLogin";
+import { PatientRegister } from "../pages/client/auth/Register";
 
 const MainLayout = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);

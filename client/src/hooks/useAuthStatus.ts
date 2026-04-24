@@ -18,7 +18,8 @@ export const useAuthStatus = () => {
 			} else if (token && !user) {
 				// loaderCalling
 				try {
-					await dispatch(fetchUser()).unwrap();
+					// TODO: Implement fetchUser thunk or replace with correct API call
+					// await dispatch(fetchUser()).unwrap();
 					setIsAuth(true);
 				} catch (error) {
 					Cookies.remove("token");
