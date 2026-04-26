@@ -8,9 +8,8 @@ export const useGetCurrentUser = () => {
   const token = useAppSelector(getAuthToken)
   return useQuery({
     queryKey: ["curerentUser", token],
-    queryFn: ({ queryKey }) => {
-      const [_key, token] = queryKey
-      return getCurrentUser(token as string)
+    queryFn: () => {
+      return getCurrentUser()
     },
     enabled: !!token,
     retry: false,

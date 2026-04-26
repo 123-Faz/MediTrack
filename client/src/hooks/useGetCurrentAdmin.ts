@@ -9,11 +9,8 @@ export const useGetCurrentAdmin = () => {
 
   return useQuery({
     queryKey: ["currentAdmin", token],
-    queryFn: async ({ queryKey }) => {
-      const [_key, token] = queryKey;
-      if (!token) throw new Error("No token found");
-
-      const data = await getCurrentAdmin(token as string);
+    queryFn: async () => {
+      const data = await getCurrentAdmin();
 
       // 🔑 normalize response
       const user = data?.user ?? data; // use data.user if available, else data
