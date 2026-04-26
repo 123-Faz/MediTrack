@@ -127,28 +127,36 @@ import { AdminProtectedRoute, DoctorProtectedRoute, ClientProtectedRoute } from 
 import AdDashboard from "@/layout/adminDashboard/index"
 import DrDashboard from "@/layout/doctorDashboard/index"
 
+
 // frontend components
 const HomePage = lazy(() => import("@/pages/home"));
 const ContactPage = lazy(() => import("@/pages/contact"));
 const AboutPage = lazy(() => import("@/pages/about"));
 const Doctors = lazy(() => import("@/pages/doctors"));
 const Appointments = lazy(() => import("@/pages/apointments"));
+const ResetPassword = lazy(() => import("@/pages/client/auth/ResetPassword"));
 
 const MyPrescription = lazy(() => import("@/pages/client/MyPrescriptions"));
 const Doctor = lazy(() => import("@/pages/client/DoctorList"));
 const MyAppintments = lazy(() => import("@/pages/client/MyAppointments"));
 const NewAppointments = lazy(() => import("@/pages/client/NewAppointment"));
 const Report = lazy(() => import("@/pages/client/ReportFiles"));
+const Profile = lazy(() => import("@/pages/client/Profile"));
+const Settings = lazy(() => import("@/pages/client/Settings"));
 const Dashboard = lazy(() => import("@/pages/client/Dashboard"));
-
-const AllUser = lazy(() => import("@/pages/admin/AllUser"));
-const AllDOctors = lazy(() => import("@/pages/admin/AllDoctors"));
-const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
 
 const DoctorDashboard = lazy(() => import("@/pages/doctor/Dashboard"));
 const MySchedules = lazy(() => import("@/pages/doctor/MySchedules"));
 const Treatment = lazy(() => import("@/pages/doctor/Treatment"));
 const MyAppointments = lazy(() => import ("@/pages/doctor/MyAppointments"))
+const DR_Profile = lazy(() => import ("@/pages/doctor/Profile"))
+const DR_Settings = lazy(() => import("@/pages/doctor/Settings"));
+
+const AllUser = lazy(() => import("@/pages/admin/AllUser"));
+const AllDOctors = lazy(() => import("@/pages/admin/AllDoctors"));
+const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
+const Ad_Profile = lazy(() => import("@/pages/admin/Profile"));
+const Ad_Settings = lazy(() => import("@/pages/admin/Settings"));
 
 const Router = () => {
 	const routes = [
@@ -176,6 +184,10 @@ const Router = () => {
 					path: "contact",
 					element: <ContactPage />,
 				},
+				{
+					path: "reset-password",
+					element: <ResetPassword />,
+				},
 			],
 		},
 
@@ -191,9 +203,10 @@ const Router = () => {
 				{ index: true, element: <AdminDashboard /> },
 				{ path: "appointments", element: <AllDOctors /> },
 				{ path: "myUsers", element: <AllUser /> },
+				{ path: "profile", element: <Ad_Profile /> },
+				{ path: "settings", element: <Ad_Settings /> },
 				// { path: "notifications", element: <AdminNotifications /> },
 				// { path: "reports", element: <AdminReports /> },
-				// { path: "settings", element: <AdminSettings /> },
 			],
 		},
 
@@ -210,9 +223,10 @@ const Router = () => {
 				{ path: "schedules", element: <MySchedules /> },
 				{ path: "appointments", element: <MyAppointments /> },
 				{ path: "treatment", element: <Treatment /> },
+				{ path: "profile", element: <DR_Profile /> },
+				{ path: "settings", element: <DR_Settings /> },
 				// { path: "notifications", element: <AdminNotifications /> },
 				// { path: "reports", element: <AdminReports /> },
-				// { path: "settings", element: <AdminSettings /> },
 			],
 		},
 
@@ -231,6 +245,8 @@ const Router = () => {
 				{ path: "myprescriptions", element: <MyPrescription /> },
 				{ path: "doctors", element: <Doctor /> },
 				{ path: "report", element: <Report /> },
+				{ path: "profile", element: <Profile /> },
+				{ path: "settings", element: <Settings /> },
 			],
 		},
 	];

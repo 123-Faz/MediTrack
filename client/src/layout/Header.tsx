@@ -116,6 +116,16 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
     }
   };
 
+    const settings = () => {
+    setShowDropdown(false);
+      switch (userRole) {
+      case 'admin': navigate("/adDashboard/settings"); break;
+      case 'doctor': navigate("/drDashboard/settings"); break;
+      case 'user': navigate("/dashboard/settings"); break;
+      default: navigate("/");
+    }
+  };
+
   const getRoleBadge = () => {
     switch (userRole) {
       case 'admin': return { color: "bg-ppl6", text: "Admin", icon: Crown, gradient: "from-ppl6 to-ppl8" };
@@ -181,7 +191,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
                   <Shield className="w-4 h-4" />
                   <span>Dashboard</span>
                 </button>
-                <button className="flex items-center space-x-3 w-full px-3 py-3 rounded-xl text-fg1-3 hover:bg-bg2 hover:text-fg0 transition-colors font-bold text-sm">
+                <button onClick={settings} className="flex items-center space-x-3 w-full px-3 py-3 rounded-xl text-fg1-3 hover:bg-bg2 hover:text-fg0 transition-colors font-bold text-sm">
                   <Settings className="w-4 h-4" />
                   <span>Settings</span>
                 </button>

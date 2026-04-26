@@ -25,9 +25,10 @@ interface UnifiedLoginProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToRegister: () => void;
+  onSwitchToForgotPassword: (role: Role) => void;
 }
 
-export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({ isOpen, onClose, onSwitchToRegister }) => {
+export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({ isOpen, onClose, onSwitchToRegister, onSwitchToForgotPassword }) => {
   const [role, setRole] = useState<Role>('patient');
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch();
@@ -123,13 +124,16 @@ export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({ isOpen, onClose, onS
             {isSubmitting ? "..." : "Sign In"}
           </button>
 
-          {role === 'patient' && (
-            <div className="text-center pt-2">
+          <div className="text-center pt-2 flex flex-col items-center gap-2">
+            <button type="button" onClick={() => onSwitchToForgotPassword(role)} className="text-[10px] font-black uppercase tracking-widest text-fg1-4 hover:text-fg0 hover:underline transition-colors">
+              Forgot Password?
+            </button>
+            {role === 'patient' && (
               <button type="button" onClick={onSwitchToRegister} className={`text-[10px] font-black uppercase tracking-widest hover:underline ${style.text}`}>
                 New? Create Account
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </form>
       </div>
     </div>

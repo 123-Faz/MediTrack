@@ -36,20 +36,15 @@ const items = [
     icon: Calendar,
   },
   {
-    title: "All Users",
-    url: "/adDashboard/myUsers",
+    title: "Profile",
+    url: "/adDashboard/profile",
     icon: User,
   },
-  // {
-  //   title: "Profile",
-  //   url: "/adDashboard/profile",
-  //   icon: User,
-  // },
-  // {
-  //   title: "Notifications",
-  //   url: "/dashboard/notifications",
-  //   icon: AlertCircle,
-  // }
+  {
+    title: "Settings",
+    url: "/adDashboard/settings",
+    icon: Settings,
+  },
 ];
 
 const UserSidebarNav = () => {

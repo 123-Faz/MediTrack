@@ -21,7 +21,7 @@ import { Moon, Sun } from "lucide-react";
 import { useState } from "react";
 import type { userLayoutContextType } from "./types";
 import ShowToast from "@/components/ShowToast";
-import { logout } from "@/store/authSlice";
+import { adminLogout } from "@/store/authAdminSlice";
 import { domAnimation, LazyMotion } from "framer-motion";
 import React from "react";
 
@@ -36,13 +36,9 @@ const UserLayout = () => {
     try {
       localStorage.setItem("loggingOut", "true");
       localStorage.setItem("showLoginAfterLogout", "true");
-      dispatch(logout());
+      dispatch(adminLogout());
       navigate("/");
 
-      // ❌ wrong: direct ShowToast call during render cycle
-      // ShowToast({ ... })
-
-      // ✅ fix: defer it so React isn’t in the middle of render
       setTimeout(() => {
         ShowToast({
           message: "Logged Out Successfully",
@@ -86,7 +82,7 @@ const UserLayout = () => {
                           </BreadcrumbPage>
                         ) : (
                           <BreadcrumbLink asChild>
-                            <Link to="/dashboard" className="themeShift">
+                            <Link to="/adDashboard" className="themeShift">
                               {item}
                             </Link>
                           </BreadcrumbLink>

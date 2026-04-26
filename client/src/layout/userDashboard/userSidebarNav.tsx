@@ -52,11 +52,11 @@ const items = [
     url: "/dashboard/doctors",
     icon: Stethoscope,
   },
-  // {
-  //   title: "Report",
-  //   url: "/dashboard/report",
-  //   icon: AlertCircle,
-  // },
+  {
+    title: "Profile",
+    url: "/dashboard/profile",
+    icon: User,
+  },
 ];
 
 const UserSidebarNav = () => {

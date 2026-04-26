@@ -27,8 +27,6 @@ export const authAdminSlice = createSlice({
   initialState,
   reducers: {
     setAdminCredentials: (state, action) => {
-      console.log("🔑 Admin login payload in slice:", action.payload);
-
       state.user = action.payload.user;
       state.token = action.payload.access_token;
 
@@ -40,9 +38,6 @@ export const authAdminSlice = createSlice({
       });
 
       localStorage.setItem("admin_user", JSON.stringify(action.payload.user));
-
-      console.log("✅ Token saved in Redux:", state.token);
-      console.log("✅ Token saved in cookie:", Cookies.get("admin_token"));
     },
 
     setUser: (state, action) => {

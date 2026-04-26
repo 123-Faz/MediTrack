@@ -38,8 +38,6 @@ export const authDoctorSlice = createSlice({
   initialState,
   reducers: {
     setDoctorCredentials: (state, action) => {
-      console.log("🔑 Doctor login payload in slice:", action.payload);
-
       state.user = action.payload.user;
       state.token = action.payload.access_token;
 
@@ -51,9 +49,6 @@ export const authDoctorSlice = createSlice({
       });
 
       localStorage.setItem("doctor_user", JSON.stringify(action.payload.user));
-
-      console.log("✅ Token saved in Redux:", state.token);
-      console.log("✅ Token saved in cookie:", Cookies.get("doctor_token"));
     },
 
     setUser: (state, action) => {

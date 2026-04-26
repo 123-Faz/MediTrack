@@ -4,15 +4,18 @@ import { Bounce, toast, ToastContainer } from "react-toastify"
 import useGetCurrentUser from "./hooks/useGetCurrentUser"
 import Loader from "./components/custom/Loader"
 import { useEffect } from "react"
-import { useAppDispatch } from "./store/hooks"
+import { useAppDispatch, useAppSelector } from "./store/hooks"
 import { logout, setUser } from "./store/authSlice"
 import { initDarkMode } from "./store/darkModeSlice"
+import { getAuthAdminToken } from "./store/authAdminSlice"
 
 function App() {
 
   const dispatch = useAppDispatch()
   const { data, error, isLoading } = useGetCurrentUser()
 
+
+  const adminToken = useAppSelector(getAuthAdminToken)
 
   useEffect(() => {
 
@@ -22,12 +25,12 @@ function App() {
       dispatch(setUser(data))
     }
 
-    if (error) {
+    if (error && !adminToken) {
       dispatch(logout())
-      toast.error("Session expired.Please Login again")
+      toast.error("Session expired. Please Login again")
     }
 
-  }, [dispatch, data, error])
+  }, [dispatch, data, error, adminToken])
   return (
     <BrowserRouter>
       <Router />

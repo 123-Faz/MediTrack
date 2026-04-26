@@ -14,9 +14,12 @@ import {
   Shield,
   Search,
   ArrowUpRight,
-  Bell
+  Bell,
+  AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Api from '@/services/api.service';
+import Cookies from 'js-cookie';
 
 interface DashboardStats {
   totalUsers: number;
@@ -51,57 +54,59 @@ const AdminDashboard: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const token = getCookie('admin_token');
+      const token = Cookies.get('admin_token');
       if (!token) {
-        setError('Authentication required');
+        console.warn('[AdminDashboard] No admin_token found in cookies');
+        setError('Authentication required. Please log in again.');
         return;
       }
 
-      // Fetch users and doctors data
-      const [usersResponse, doctorsResponse] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/admin/users`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+      console.log('[AdminDashboard] Fetching dashboard data...');
+      
+      // Fetch users and doctors data using centralized Api service
+      const [usersRes, doctorsRes] = await Promise.all([
+        Api.get("admin/users", {
+          headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch(`${import.meta.env.VITE_API_URL}/admin/get-all-drs`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+        Api.get("admin/get-all-drs", {
+          headers: { Authorization: `Bearer ${token}` }
         })
       ]);
 
-      if (!usersResponse.ok || !doctorsResponse.ok) {
-        throw new Error('Failed to fetch dashboard data');
-      }
-
-      const usersData = await usersResponse.json();
-      const doctorsData = await doctorsResponse.json();
+      console.log('[AdminDashboard] Data fetched successfully:', { 
+        usersCount: usersRes.data.length, 
+        doctorsCount: doctorsRes.data.length 
+      });
 
       // Calculate stats from real data
       setStats({
-        totalUsers: usersData.length || 0,
-        totalDoctors: doctorsData.length || 0,
-        totalAppointments: 0, // You can add appointments API later
-        activeSchedules: doctorsData.filter((doctor: any) => doctor.schedule).length || 0
+        totalUsers: usersRes.data.length || 0,
+        totalDoctors: doctorsRes.data.length || 0,
+        totalAppointments: 0,
+        activeSchedules: doctorsRes.data.filter((doctor: any) => doctor.schedule).length || 0
       });
 
-    } catch (err) {
-      console.error('Error fetching dashboard data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+    } catch (err: any) {
+      console.error('[AdminDashboard] Error fetching dashboard data:', err);
+      
+      let errorMessage = 'Failed to load dashboard';
+      if (err.response) {
+        // Server responded with a status code outside the 2xx range
+        errorMessage = err.response.data?.message || err.response.data?.error || `Server Error: ${err.response.status}`;
+        if (err.response.status === 401) {
+          errorMessage = "Unauthorized: Your session may have expired. Please log in again.";
+        }
+      } else if (err.request) {
+        // Request was made but no response was received
+        errorMessage = "Network Error: No response from server. Please check your connection.";
+      } else {
+        errorMessage = err.message || 'An unexpected error occurred';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
-
-  const getCookie = (name: string): string | null => {
-    if (typeof document === 'undefined') return null;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
   };
 
   const getGrowthPercentage = (current: number, previous: number) => {
@@ -125,10 +130,10 @@ const AdminDashboard: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-bg1 to-bg2 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-rd1 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Activity className="w-8 h-8 text-rd6" />
+            <AlertTriangle className="w-8 h-8 text-rd6" />
           </div>
           <h3 className="text-lg font-semibold text-fg0 mb-2">Unable to Load Dashboard</h3>
-          <p className="text-fg1-4 mb-4">{error}</p>
+          <p className="text-fg1-4 mb-4 max-w-md mx-auto">{error}</p>
           <button
             onClick={fetchDashboardData}
             className="px-4 py-2 bg-bl6 text-white rounded-lg hover:bg-bl7 transition-colors"

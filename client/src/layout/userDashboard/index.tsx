@@ -38,11 +38,6 @@ const UserLayout = () => {
       localStorage.setItem("showLoginAfterLogout", "true");
       dispatch(logout());
       navigate("/");
-
-      // ❌ wrong: direct ShowToast call during render cycle
-      // ShowToast({ ... })
-
-      // ✅ fix: defer it so React isn’t in the middle of render
       setTimeout(() => {
         ShowToast({
           message: "Logged Out Successfully",

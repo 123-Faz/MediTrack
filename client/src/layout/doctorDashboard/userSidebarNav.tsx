@@ -5,7 +5,8 @@ import {
   AlertCircle,
   Stethoscope,
   CalendarCheck,
-   Clock
+   Clock,
+   User
 } from "lucide-react";
 
 import {
@@ -45,16 +46,16 @@ const items = [
     url: "/drDashboard/treatment",
     icon: Stethoscope,
   },
-  // {
-  //   title: "Notifications",
-  //   url: "/drdashboard/notifications",
-  //   icon: AlertCircle,
-  // },
-  // {
-  //   title: "Settings",
-  //   url: "/dashboard/settings",
-  //   icon: Settings,
-  // },
+  {
+    title: "Profile",
+    url: "/drDashboard/profile",
+    icon: User,
+  },
+  {
+    title: "Settings",
+    url: "/drDashboard/settings",
+    icon: Settings,
+  },
 ];
 
 const UserSidebarNav = () => {

@@ -4,19 +4,24 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { UnifiedLogin } from "../components/auth/UnifiedLogin";
 import { PatientRegister } from "../pages/client/auth/Register";
+import { ForgotPasswordModal } from "../components/auth/ForgotPasswordModal";
 
 const MainLayout = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [authRole, setAuthRole] = useState<"patient" | "doctor" | "admin">("patient");
 
   const handleLoginOpen = () => {
     setIsLoginOpen(true);
     setIsRegisterOpen(false);
+    setIsForgotPasswordOpen(false);
   };
 
   const handleLoginClose = () => {
     setIsLoginOpen(false);
     setIsRegisterOpen(false);
+    setIsForgotPasswordOpen(false);
   };
 
   const handleSwitchToRegister = () => {
@@ -27,6 +32,13 @@ const MainLayout = () => {
   const handleSwitchToLogin = () => {
     setIsRegisterOpen(false);
     setIsLoginOpen(true);
+    setIsForgotPasswordOpen(false);
+  };
+
+  const handleSwitchToForgotPassword = (role: "patient" | "doctor" | "admin") => {
+    setAuthRole(role);
+    setIsLoginOpen(false);
+    setIsForgotPasswordOpen(true);
   };
 
   return (
@@ -45,6 +57,7 @@ const MainLayout = () => {
         isOpen={isLoginOpen} 
         onClose={handleLoginClose}
         onSwitchToRegister={handleSwitchToRegister}
+        onSwitchToForgotPassword={handleSwitchToForgotPassword}
       />
 
       {/* Patient Register Component */}
@@ -52,6 +65,14 @@ const MainLayout = () => {
         isOpen={isRegisterOpen} 
         onClose={handleLoginClose}
         onSwitchToLogin={handleSwitchToLogin}
+      />
+
+      {/* Forgot Password Component */}
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onClose={handleLoginClose}
+        onBackToLogin={handleSwitchToLogin}
+        role={authRole}
       />
     </div>
   );

@@ -12,6 +12,7 @@ import {
   Bell,
   ChevronsUpDown,
   CreditCard,
+  Settings,
   Stethoscope,
   User,
   LogOut,
@@ -120,9 +121,9 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ logoutHandle }) => {
                       Profile
                     </DropdownMenuItem>
                   </Link>
-                  <Link to="/dashboard/settings">
+                  <Link to="settings">
                     <DropdownMenuItem>
-                      <CreditCard />
+                      <Settings />
                       Settings
                     </DropdownMenuItem>
                   </Link>
