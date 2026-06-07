@@ -61,7 +61,21 @@ export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({ isOpen, onClose, onS
       onClose();
     },
     onError: (error: any) => {
-      toast.error(error || "Login failed.");
+      let errorMessage = "Login failed.";
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object') {
+        if (error.response?.data?.error) {
+          const backendError = error.response.data.error;
+          errorMessage = typeof backendError === 'string' ? backendError : Object.values(backendError)[0] as string;
+        } else if (error.message && Object.keys(error).length === 0) {
+          errorMessage = error.message;
+        } else {
+          const firstVal = Object.values(error)[0];
+          if (typeof firstVal === 'string') errorMessage = firstVal;
+        }
+      }
+      toast.error(errorMessage || "Login failed.");
     }
   });
 
@@ -107,17 +121,19 @@ export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({ isOpen, onClose, onS
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 pt-4 space-y-3">
           <div className="space-y-1">
             <label className="text-[10px] font-black text-fg1-4 uppercase tracking-widest ml-1">Username/Email</label>
-            <input {...register("username")} type="text" className={`w-full px-4 py-2.5 bg-bg2 border border-bg3 rounded-xl focus:ring-2 outline-none text-sm text-fg0 font-bold ${style.ring}`} />
+            <input {...register("username")} type="text" className={`w-full px-4 py-2.5 bg-bg2 border ${errors.username ? 'border-red-500' : 'border-bg3'} rounded-xl focus:ring-2 outline-none text-sm text-fg0 font-bold ${style.ring}`} />
+            {errors.username && <p className="text-red-500 text-[10px] font-bold ml-1">{errors.username.message}</p>}
           </div>
 
           <div className="space-y-1">
             <label className="text-[10px] font-black text-fg1-4 uppercase tracking-widest ml-1">Password</label>
             <div className="relative">
-              <input {...register("password")} type={showPassword ? "text" : "password"} className={`w-full px-4 py-2.5 bg-bg2 border border-bg3 rounded-xl focus:ring-2 outline-none text-sm text-fg0 font-bold ${style.ring}`} />
+              <input {...register("password")} type={showPassword ? "text" : "password"} className={`w-full px-4 py-2.5 bg-bg2 border ${errors.password ? 'border-red-500' : 'border-bg3'} rounded-xl focus:ring-2 outline-none text-sm text-fg0 font-bold ${style.ring}`} />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-fg1-5 text-xs">
                 {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
+            {errors.password && <p className="text-red-500 text-[10px] font-bold ml-1">{errors.password.message}</p>}
           </div>
 
           <button type="submit" disabled={isSubmitting} className={`w-full py-3 mt-4 rounded-xl font-black text-white shadow-lg ${style.accent}`}>

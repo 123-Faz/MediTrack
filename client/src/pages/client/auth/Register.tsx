@@ -47,7 +47,21 @@ export const PatientRegister: React.FC<PatientRegisterProps> = ({
       onSwitchToLogin();
     },
     onError: (error: any) => {
-      toast.error(error || "Registration failed.");
+      let errorMessage = "Registration failed.";
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object') {
+        if (error.response?.data?.error) {
+          const backendError = error.response.data.error;
+          errorMessage = typeof backendError === 'string' ? backendError : Object.values(backendError)[0] as string;
+        } else if (error.message && Object.keys(error).length === 0) {
+          errorMessage = error.message;
+        } else {
+          const firstVal = Object.values(error)[0];
+          if (typeof firstVal === 'string') errorMessage = firstVal;
+        }
+      }
+      toast.error(errorMessage || "Registration failed.");
     }
   });
 
@@ -76,32 +90,36 @@ export const PatientRegister: React.FC<PatientRegisterProps> = ({
               <label className="text-[10px] font-black text-fg1-4 uppercase tracking-widest ml-1">Username</label>
               <div className="relative group">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg1-5" />
-                <input {...register("username")} type="text" placeholder="Choose username" className="w-full pl-10 pr-4 py-2 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl6 outline-none text-sm text-fg0 font-bold" />
+                <input {...register("username")} type="text" placeholder="Choose username" className={`w-full pl-10 pr-4 py-2 bg-bg2 border ${errors.username ? 'border-red-500' : 'border-bg3'} rounded-xl focus:ring-2 focus:ring-bl6 outline-none text-sm text-fg0 font-bold`} />
               </div>
+              {errors.username && <p className="text-red-500 text-[10px] font-bold ml-1">{errors.username.message}</p>}
             </div>
 
             <div className="space-y-1">
               <label className="text-[10px] font-black text-fg1-4 uppercase tracking-widest ml-1">Email</label>
               <div className="relative group">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg1-5" />
-                <input {...register("email")} type="email" placeholder="your@email.com" className="w-full pl-10 pr-4 py-2 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl6 outline-none text-sm text-fg0 font-bold" />
+                <input {...register("email")} type="email" placeholder="your@email.com" className={`w-full pl-10 pr-4 py-2 bg-bg2 border ${errors.email ? 'border-red-500' : 'border-bg3'} rounded-xl focus:ring-2 focus:ring-bl6 outline-none text-sm text-fg0 font-bold`} />
               </div>
+              {errors.email && <p className="text-red-500 text-[10px] font-bold ml-1">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-1">
               <label className="text-[10px] font-black text-fg1-4 uppercase tracking-widest ml-1">Password</label>
               <div className="relative group">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg1-5" />
-                <input {...register("password")} type={showPassword ? "text" : "password"} placeholder="••••••••" className="w-full pl-10 pr-10 py-2 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl6 outline-none text-sm text-fg0 font-bold" />
+                <input {...register("password")} type={showPassword ? "text" : "password"} placeholder="••••••••" className={`w-full pl-10 pr-10 py-2 bg-bg2 border ${errors.password ? 'border-red-500' : 'border-bg3'} rounded-xl focus:ring-2 focus:ring-bl6 outline-none text-sm text-fg0 font-bold`} />
               </div>
+              {errors.password && <p className="text-red-500 text-[10px] font-bold ml-1">{errors.password.message}</p>}
             </div>
 
             <div className="space-y-1">
               <label className="text-[10px] font-black text-fg1-4 uppercase tracking-widest ml-1">Confirm</label>
               <div className="relative group">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg1-5" />
-                <input {...register("password_confirmation")} type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" className="w-full pl-10 pr-10 py-2 bg-bg2 border border-bg3 rounded-xl focus:ring-2 focus:ring-bl6 outline-none text-sm text-fg0 font-bold" />
+                <input {...register("password_confirmation")} type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" className={`w-full pl-10 pr-10 py-2 bg-bg2 border ${errors.password_confirmation ? 'border-red-500' : 'border-bg3'} rounded-xl focus:ring-2 focus:ring-bl6 outline-none text-sm text-fg0 font-bold`} />
               </div>
+              {errors.password_confirmation && <p className="text-red-500 text-[10px] font-bold ml-1">{errors.password_confirmation.message}</p>}
             </div>
           </div>
 
